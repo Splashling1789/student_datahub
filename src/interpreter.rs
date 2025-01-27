@@ -1,5 +1,6 @@
 use std::process;
-use crate::{plan, status, subject, usage};
+use crate::{plan, usage};
+use crate::plan::{status, subject};
 
 pub fn interpret(args: &mut Vec<String>) {
     match args.len() {
@@ -11,8 +12,8 @@ pub fn interpret(args: &mut Vec<String>) {
             let option = args.get(0).unwrap().clone();
             args.remove(0);
             match option.trim() {
-                "status" => status::get_status(),
-                "plan" => plan::interpret(args),
+                "status" => status::display_status(),
+                "plan" => interpret(args),
                 "subject" => subject::interpret(args),
                 _ => {}
             }

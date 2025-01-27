@@ -1,10 +1,9 @@
 mod usage;
 mod plan;
 mod interpreter;
-mod status;
 mod models;
 mod schema;
-mod subject;
+mod error_handler;
 
 use std::env;
 use colored::Colorize;
@@ -16,6 +15,7 @@ macro_rules! debug_println {
         }
     };
 }
+pub(crate) use debug_println;
 
 fn main() {
     let mut args = env::args().collect::<Vec<String>>();

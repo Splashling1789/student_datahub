@@ -3,7 +3,7 @@
 diesel::table! {
     entry (id) {
         id -> Integer,
-        date -> Text,
+        date -> Date,
         subject_id -> Integer,
         dedicated_time -> Integer,
     }
@@ -12,8 +12,8 @@ diesel::table! {
 diesel::table! {
     periods (id) {
         id -> Integer,
-        initial_date -> Text,
-        final_date -> Text,
+        initial_date -> Date,
+        final_date -> Date,
         description -> Text,
     }
 }
