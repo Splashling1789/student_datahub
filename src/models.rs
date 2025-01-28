@@ -3,6 +3,8 @@ use diesel::deserialize::FromSqlRow;
 use diesel::internal::derives::multiconnection::chrono::NaiveDate;
 use diesel::row::{Row};
 use diesel::sqlite::Sqlite;
+use crate::schema::periods::dsl::periods;
+use crate::schema::periods::{final_date, initial_date};
 
 #[derive(FromSqlRow)]
 pub struct DateTime(pub NaiveDate);
@@ -25,6 +27,12 @@ pub struct Entry {
     pub date: NaiveDate,
     pub subject_id: i32,
     pub dedicated_time: i32
+}
+
+impl Entry {
+    pub fn get_period(&self, conn: &mut SqliteConnection) -> Option<Period> {
+        periods.filter(initial_date.le(&self.date)).filter(final_date.ge(&self.date)).load::<Period>(conn).expect("Error loading period").pop()
+    }
 }
 
 #[derive(Selectable, Queryable, Clone, Debug)]
