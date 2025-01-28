@@ -1,18 +1,14 @@
 use std::process;
-use std::process::exit;
 use colored::Colorize;
-use diesel::dsl::{insert_into, sql};
+use diesel::dsl::{insert_into};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
-use diesel::internal::operators_macro::FieldAliasMapper;
 use diesel::prelude::*;
 
 use diesel::SqliteConnection;
 use crate::debug_println;
-use crate::error_handler::connection_error_handler;
-use crate::models::{DateTime, Period};
+use crate::models::{Period};
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{description, final_date, initial_date};
-use crate::schema::subjects::dsl::subjects;
 
 const FORMAT : &str = "%m-%d-%Y";
 
@@ -65,7 +61,7 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
                     }
                 };
                 println!("Study periods:");
-                if(list.is_empty()) {
+                if list.is_empty() {
                     println!("No periods created yet.");
                 }
                 for i in list {

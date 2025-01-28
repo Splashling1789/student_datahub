@@ -1,5 +1,5 @@
 use std::process;
-use crate::{plan, usage};
+use crate::{usage};
 use crate::plan::{status, subject};
 
 pub fn interpret(args: &mut Vec<String>) {

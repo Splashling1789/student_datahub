@@ -1,8 +1,7 @@
 use diesel::prelude::*;
 use diesel::deserialize::FromSqlRow;
 use diesel::internal::derives::multiconnection::chrono::NaiveDate;
-use diesel::row::{Field, Row};
-use diesel::sql_types::{Integer, Text};
+use diesel::row::{Row};
 use diesel::sqlite::Sqlite;
 
 #[derive(FromSqlRow)]
