@@ -48,9 +48,7 @@ pub fn get_actual_period(conn: &mut SqliteConnection) -> Option<Period> {
 }
 
 fn get_plan_arg(args: &mut Vec<String>) -> i32 {
-    match args
-        .get(args.iter().enumerate().find(|a| a.1 == "--plan").unwrap().0 + 1)
-        .cloned()
+    match get_specific_arg(args, "--plan")
     {
         Some(plan_id) => match plan_id.parse::<i32>() {
             Ok(r) => r,
@@ -64,6 +62,12 @@ fn get_plan_arg(args: &mut Vec<String>) -> i32 {
             process::exit(1);
         }
     }
+}
+
+fn get_specific_arg(args: &mut Vec<String>, find : &str) -> Option<String> {
+    args
+        .get(args.iter().enumerate().find(|a| a.1 == find).unwrap().0 + 1)
+        .cloned()
 }
 
 fn is_actual(p: &Period) -> bool {
@@ -102,7 +106,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                         println!("{}", i.to_string());
                     }
                 }
-            } // list commando ends here
+            } // list command ends here
             "start" => {
                 if args.len() < 2 {
                     display_bad_usage();
