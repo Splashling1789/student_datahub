@@ -4,17 +4,17 @@ use diesel::dsl::{insert_into};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::prelude::*;
 
-use diesel::SqliteConnection;
+use diesel::{delete, SqliteConnection};
 use crate::debug_println;
 use crate::models::{Period};
 use crate::schema::periods::dsl::periods;
-use crate::schema::periods::{description, final_date, initial_date};
+use crate::schema::periods::{description, final_date, id, initial_date};
 
 const FORMAT : &str = "%m-%d-%Y";
 
 fn display_bad_usage() {
     println!(
-        "Bad usage: {} plan ...:\n|
+        "Bad usage: {} plan ...:\n
         - start [start] (end) (description) : Starts a new study plan. It starts today if no start date is provided.
         - list : Lists all the study periods.
         - modify [--plan (plan id)] [--start (new start date)] [--end (new end date)] [--description (new description)] : Modifies the current plan (or one determined by an id).
@@ -46,8 +46,9 @@ fn is_actual(p : &Period) -> bool{
 }
 
 pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
-    if args.len() < 2 {
-        display_bad_usage()
+    if args.len() == 0 {
+        display_bad_usage();
+        process::exit(1);
     }
     else {
         let option = args.get(0).cloned().unwrap();
@@ -67,10 +68,10 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
                 }
                 for i in list {
                     if is_actual(&i) {
-                        println!("{}", format!("{}-{}\t{} (ID:{})", i.initial_date.format(FORMAT).to_string(), i.final_date.format(FORMAT).to_string(), i.description.to_string(), i.id).green());
+                        println!("{}", format!("{} - {}\t{} (ID:{})", i.initial_date.format(FORMAT).to_string(), i.final_date.format(FORMAT).to_string(), i.description.to_string(), i.id).green());
                     }
                     else {
-                        println!("{}-{}\t{} (ID:{})", i.initial_date.format(FORMAT).to_string(), i.final_date.format(FORMAT).to_string(), i.description.to_string(), i.id);
+                        println!("{} - {}\t{} (ID:{})", i.initial_date.format(FORMAT).to_string(), i.final_date.format(FORMAT).to_string(), i.description.to_string(), i.id);
                     }
                 }
             }
@@ -123,7 +124,7 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
                         if (period.initial_date <= _end && period.initial_date >= _start) ||
                             (period.final_date <= _end && period.final_date >= _start) ||
                             (period.initial_date <= _start && period.final_date >= _end) {
-                            eprintln!("Invalid arguments: Current study period overlaps the provided period.");
+                            eprintln!("Invalid state: Current study period overlaps the provided period.");
                             process::exit(1);
                         }
                     }
@@ -142,11 +143,64 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
                 }
             } // start command ends here
             "remove" => {
-                if args.len() == 0 {
-                    println!("Are you sure you want to remove the current study plan?");
+                let plan : i32 = match args.contains(&"--plan".to_string()) {
+                    true => {
+                        for (i, arg) in args.iter().enumerate() {
+                            if arg.eq("--plan") {
+                                match args.get(i+1) {
+                                    Some(s) => {
+                                        let plan_id = match s.parse::<i32>() {
+                                            Ok(r) => r,
+                                            Err(e) => {
+                                                eprintln!("Failed to parse id.");
+                                                process::exit(1);
+                                            }
+                                        };
+                                    },
+                                    None => {
+                                        display_bad_usage();
+                                        process::exit(1);
+                                    }
+                                }
+                            }
+                        }
+                        debug_println!("The --plan flag is found in contains, but not in the for loop.");
+                        process::exit(1);
+                    }
+                    false => {
+                        match get_actual_period(conn) {
+                            Some(period) => period.id,
+                            None => {
+                                eprintln!("There is no period to remove. You can specify it with --plan (period id).");
+                                process::exit(1);
+                            }
+                        }
+                    }
+                };
+
+                if ! args.contains(&"--confirm".to_string()) {
+                    println!("Are you sure you want to remove the current study plan? [y/n]: ");
+                    let mut response = String::new();
+                    std::io::stdin().read_line(&mut response)
+                        .expect("Failed to read line. If this keeps ocurring, use --confirm to skip stdin readlines");
+                    if response.to_lowercase().trim() != "y" && response.to_lowercase().trim() != "yes" {
+                        println!("Aborting");
+                    }
+                }
+
+                match delete(periods.filter(id.eq(plan))).execute(conn) {
+                    Ok(_) => {
+                        println!("Plan deleted successfully");
+                        process::exit(0);
+                    }
+                    Err(e) => {
+                        eprintln!("Failed to delete: {e}");
+                        process::exit(1);
+                    }
                 }
             }
-            _ => {
+            k => {
+                debug_println!("No valid argument. Provided: {k}");
                 display_bad_usage();
                 process::exit(1);
             }
