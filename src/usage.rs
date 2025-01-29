@@ -1,5 +1,4 @@
-
-fn get_usage_string() -> String{
+fn get_usage_string() -> String {
     format!(
         "USAGE: {} subcommand [options]\n\n\
         Avaliable subcommands:\n\

@@ -31,8 +31,4 @@ diesel::table! {
 diesel::joinable!(entry -> subjects (subject_id));
 diesel::joinable!(subjects -> periods (period_id));
 
-diesel::allow_tables_to_appear_in_same_query!(
-    entry,
-    periods,
-    subjects,
-);
+diesel::allow_tables_to_appear_in_same_query!(entry, periods, subjects,);

@@ -1,14 +1,14 @@
-use std::{env, process};
-use diesel::{Connection, SqliteConnection};
-use crate::{debug_println, usage};
 use crate::plan::{period, status, subject};
+use crate::{debug_println, usage};
+use diesel::{Connection, SqliteConnection};
+use std::{env, process};
 
 pub fn interpret(args: &mut Vec<String>) {
     match args.len() {
         0 => {
             usage::display_usage();
             process::exit(0);
-        },
+        }
         _ => {
             let option = args.get(0).unwrap().clone();
             args.remove(0);

@@ -1,12 +1,11 @@
-mod usage;
-mod plan;
+mod error_handler;
 mod interpreter;
 mod models;
+mod plan;
 mod schema;
-mod error_handler;
+mod usage;
 
 use std::env;
-
 
 macro_rules! debug_println {
     ($($arg:tt)*) => {
