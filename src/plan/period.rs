@@ -11,9 +11,9 @@ use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{description, final_date, id, initial_date};
 use diesel::{delete, SqliteConnection};
 
-pub(crate) const FORMAT: &str = "%m-%d-%Y";
+pub const FORMAT: &str = "%m-%d-%Y";
 
-pub(crate) fn display_bad_usage() {
+pub fn display_bad_usage() {
     println!(
         "Bad usage: {} plan ...:\n
         - start [start] (end) (description) : Starts a new study plan. It starts today if no start date is provided.

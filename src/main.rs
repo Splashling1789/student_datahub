@@ -6,6 +6,7 @@ mod schema;
 mod usage;
 
 use std::env;
+use colored::Color;
 
 macro_rules! debug_println {
     ($($arg:tt)*) => {
