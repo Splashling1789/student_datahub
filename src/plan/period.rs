@@ -1,18 +1,19 @@
-use std::process;
 use colored::Colorize;
-use diesel::dsl::{insert_into};
+use diesel::dsl::insert_into;
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::prelude::*;
+use std::process;
 
-use diesel::{delete, SqliteConnection};
 use crate::debug_println;
-use crate::models::{Period};
+use crate::models::Period;
+use crate::plan::period;
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{description, final_date, id, initial_date};
+use diesel::{delete, SqliteConnection};
 
-const FORMAT : &str = "%m-%d-%Y";
+pub(crate) const FORMAT: &str = "%m-%d-%Y";
 
-fn display_bad_usage() {
+pub(crate) fn display_bad_usage() {
     println!(
         "Bad usage: {} plan ...:\n
         - start [start] (end) (description) : Starts a new study plan. It starts today if no start date is provided.
@@ -25,10 +26,17 @@ fn display_bad_usage() {
 
 pub fn get_actual_period(conn: &mut SqliteConnection) -> Option<Period> {
     let now = Local::now().date_naive();
-    match periods.filter(initial_date.le(now)).filter(final_date.ge(now)).load::<Period>(conn) {
+    match periods
+        .filter(initial_date.le(now))
+        .filter(final_date.ge(now))
+        .load::<Period>(conn)
+    {
         Ok(period) => {
             if period.len() != 1 {
-                debug_println!("There is more than one period ocurring now! Content: {:?}", period);
+                debug_println!(
+                    "There is more than one period ocurring now! Content: {:?}",
+                    period
+                );
             }
             period.first().cloned()
         }
@@ -39,18 +47,39 @@ pub fn get_actual_period(conn: &mut SqliteConnection) -> Option<Period> {
     }
 }
 
-fn is_actual(p : &Period) -> bool{
-    let now = Local::now().date_naive();
-    if now >= p.initial_date && now <= p.final_date {true}
-    else {false}
+fn get_plan_arg(args: &mut Vec<String>) -> i32 {
+    match args
+        .get(args.iter().enumerate().find(|a| a.1 == "--plan").unwrap().0 + 1)
+        .cloned()
+    {
+        Some(plan_id) => match plan_id.parse::<i32>() {
+            Ok(r) => r,
+            Err(e) => {
+                eprintln!("Failed to parse id.");
+                process::exit(1);
+            }
+        },
+        None => {
+            period::display_bad_usage();
+            process::exit(1);
+        }
+    }
 }
 
-pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
+fn is_actual(p: &Period) -> bool {
+    let now = Local::now().date_naive();
+    if now >= p.initial_date && now <= p.final_date {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
     if args.len() == 0 {
         display_bad_usage();
         process::exit(1);
-    }
-    else {
+    } else {
         let option = args.get(0).cloned().unwrap();
         args.remove(0);
         match option.trim() {
@@ -68,52 +97,65 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
                 }
                 for i in list {
                     if is_actual(&i) {
-                        println!("{}", format!("{} - {}\t{} (ID:{})", i.initial_date.format(FORMAT).to_string(), i.final_date.format(FORMAT).to_string(), i.description.to_string(), i.id).green());
-                    }
-                    else {
-                        println!("{} - {}\t{} (ID:{})", i.initial_date.format(FORMAT).to_string(), i.final_date.format(FORMAT).to_string(), i.description.to_string(), i.id);
+                        println!("{}", i.to_string().green());
+                    } else {
+                        println!("{}", i.to_string());
                     }
                 }
-            }
+            } // list commando ends here
             "start" => {
                 if args.len() < 2 {
                     display_bad_usage();
                     process::exit(1);
-                }
-                else {
-                    let (_start, _end, _description) : (NaiveDate, NaiveDate, String) = match args.len() {
-                        2 => (
-                            Local::now().naive_local().date(),
-                            match NaiveDate::parse_from_str(&args[0], FORMAT){
-                                Ok(date) => date,
-                                Err(e) => {
-                                    eprintln!("Could not parse date. Remember using format '{}'", FORMAT);
-                                    eprintln!("{e}");
-                                    process::exit(1);
-                                }
-                            },
-                            args[1].to_string()),
+                } else {
+                    let (_start, _end, _description): (NaiveDate, NaiveDate, String) =
+                        match args.len() {
+                            2 => (
+                                Local::now().naive_local().date(),
+                                match NaiveDate::parse_from_str(&args[0], FORMAT) {
+                                    Ok(date) => date,
+                                    Err(e) => {
+                                        eprintln!(
+                                            "Could not parse date. Remember using format '{}'",
+                                            FORMAT
+                                        );
+                                        eprintln!("{e}");
+                                        process::exit(1);
+                                    }
+                                },
+                                args[1].to_string(),
+                            ),
 
-                        3 => (
-                            match NaiveDate::parse_from_str(&args[0], FORMAT) {
-                                Ok(date) => date,
-                                Err(e) => {
-                                    eprintln!("Could not parse date. Remember using format '{}'", FORMAT);
-                                    eprintln!("{e}");
-                                    process::exit(1);
-                                }
-                            },
-                            match NaiveDate::parse_from_str(&args[1], FORMAT) {
-                                Ok(date) => date,
-                                Err(e) => {
-                                    eprintln!("Could not parse date. Remember using format '{}'", FORMAT);
-                                    eprintln!("{e}");
-                                    process::exit(1);
-                                }
-                            },
-                            args[2].to_string()),
-                        _ => {display_bad_usage(); process::exit(1);}
-                    };
+                            3 => (
+                                match NaiveDate::parse_from_str(&args[0], FORMAT) {
+                                    Ok(date) => date,
+                                    Err(e) => {
+                                        eprintln!(
+                                            "Could not parse date. Remember using format '{}'",
+                                            FORMAT
+                                        );
+                                        eprintln!("{e}");
+                                        process::exit(1);
+                                    }
+                                },
+                                match NaiveDate::parse_from_str(&args[1], FORMAT) {
+                                    Ok(date) => date,
+                                    Err(e) => {
+                                        eprintln!(
+                                            "Could not parse date. Remember using format '{}'",
+                                            FORMAT
+                                        );
+                                        eprintln!("{e}");
+                                        process::exit(1);
+                                    }
+                                },
+                                args[2].to_string(),
+                            ),
+                            _ => {
+                                display_bad_usage();
+                                process::exit(1);
+                            }
+                        };
 
                     if _end < _start {
                         eprintln!("Invalid arguments: End date can't be before start date.");
@@ -121,17 +163,25 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
                     }
 
                     if let Some(period) = get_actual_period(conn) {
-                        if (period.initial_date <= _end && period.initial_date >= _start) ||
-                            (period.final_date <= _end && period.final_date >= _start) ||
-                            (period.initial_date <= _start && period.final_date >= _end) {
-                            eprintln!("Invalid state: Current study period overlaps the provided period.");
+                        if (period.initial_date <= _end && period.initial_date >= _start)
+                            || (period.final_date <= _end && period.final_date >= _start)
+                            || (period.initial_date <= _start && period.final_date >= _end)
+                        {
+                            eprintln!(
+                                "Invalid state: Current study period overlaps the provided period."
+                            );
                             process::exit(1);
                         }
                     }
 
                     match insert_into(periods)
-                        .values((initial_date.eq(_start), final_date.eq(_end), description.eq(_description)))
-                        .execute(conn) {
+                        .values((
+                            initial_date.eq(_start),
+                            final_date.eq(_end),
+                            description.eq(_description),
+                        ))
+                        .execute(conn)
+                    {
                         Ok(_) => {
                             println!("The plan created succesfully");
                         }
@@ -143,48 +193,31 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
                 }
             } // start command ends here
             "remove" => {
-                let plan : i32 = match args.contains(&"--plan".to_string()) {
-                    true => {
-                        for (i, arg) in args.iter().enumerate() {
-                            if arg.eq("--plan") {
-                                match args.get(i+1) {
-                                    Some(s) => {
-                                        let plan_id = match s.parse::<i32>() {
-                                            Ok(r) => r,
-                                            Err(e) => {
-                                                eprintln!("Failed to parse id.");
-                                                process::exit(1);
-                                            }
-                                        };
-                                    },
-                                    None => {
-                                        display_bad_usage();
-                                        process::exit(1);
-                                    }
-                                }
-                            }
-                        }
-                        debug_println!("The --plan flag is found in contains, but not in the for loop.");
-                        process::exit(1);
-                    }
-                    false => {
-                        match get_actual_period(conn) {
-                            Some(period) => period.id,
+                let plan: i32 = get_plan_arg(args);
+                if !args.contains(&"--confirm".to_string()) {
+                    let period = match periods.filter(id.eq(plan)).load::<Period>(conn) {
+                        Ok(period) => match period.first().cloned() {
+                            Some(period) => period,
                             None => {
-                                eprintln!("There is no period to remove. You can specify it with --plan (period id).");
+                                eprintln!("Plan not found");
                                 process::exit(1);
                             }
+                        },
+                        Err(e) => {
+                            println!("Failed to fetch period: {e}");
+                            process::exit(1);
                         }
-                    }
-                };
-
-                if ! args.contains(&"--confirm".to_string()) {
-                    println!("Are you sure you want to remove the current study plan? [y/n]: ");
+                    };
+                    println!("{}", period.to_string());
+                    println!("Are you sure you want to remove the study plan? [y/n]: ");
                     let mut response = String::new();
                     std::io::stdin().read_line(&mut response)
                         .expect("Failed to read line. If this keeps ocurring, use --confirm to skip stdin readlines");
-                    if response.to_lowercase().trim() != "y" && response.to_lowercase().trim() != "yes" {
+                    if response.to_lowercase().trim() != "y"
+                        && response.to_lowercase().trim() != "yes"
+                    {
                         println!("Aborting");
+                        process::exit(0);
                     }
                 }
 
@@ -198,6 +231,17 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
                         process::exit(1);
                     }
                 }
+            } // remove command ends here
+            "modify" => {
+                let plan_id: i32 = get_plan_arg(args);
+                let plan = match periods.filter(id.eq(plan_id)).load::<Period>(conn) {
+                    Ok(period) => period,
+                    Err(e) => {
+                        eprintln!("Failed to fetch period: {e}");
+                        process::exit(1);
+                    }
+                };
+                // TODO: Modify all given values
             }
             k => {
                 debug_println!("No valid argument. Provided: {k}");
