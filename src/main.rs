@@ -6,11 +6,12 @@ mod schema;
 mod error_handler;
 
 use std::env;
-use colored::Colorize;
+
 
 macro_rules! debug_println {
     ($($arg:tt)*) => {
         if cfg!(debug_assertions) {
+            use colored::Colorize;
             println!("{}", format!("[DEBUG] {}", format!($($arg)*)).yellow());
         }
     };

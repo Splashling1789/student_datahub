@@ -1,5 +1,4 @@
 use std::{env, process};
-use colored::Colorize;
 use diesel::{Connection, SqliteConnection};
 use crate::{debug_println, usage};
 use crate::plan::{period, status, subject};
