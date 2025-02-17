@@ -29,7 +29,7 @@ pub fn get_actual_period(conn: &mut SqliteConnection) -> Option<Period> {
     match periods
         .filter(initial_date.le(now))
         .filter(final_date.ge(now))
-        .load::<Period>(conn)
+
     {
         Ok(period) => {
             if period.len() != 1 {
@@ -88,6 +88,18 @@ fn get_specific_arg(args: &mut Vec<String>, find : &str) -> Option<String> {
         .cloned()
 }
 
+fn fetch_all_plans(conn: &mut SqliteConnection) -> Vec<Period> {
+    match periods.load::<Period>(conn) {
+        Ok(p) => {
+            p
+        }
+        Err(e) => {
+            eprintln!("Failed to load the periods.");
+            process::exit(1);
+        }
+    }
+}
+
 fn is_actual(p: &Period) -> bool {
     let now = Local::now().date_naive();
     if now >= p.initial_date && now <= p.final_date {
@@ -95,6 +107,13 @@ fn is_actual(p: &Period) -> bool {
     } else {
         false
     }
+}
+
+fn period_overlaps(p1 : (NaiveDate, NaiveDate), p2 : (NaiveDate, NaiveDate)) -> bool {
+    (p1.0 <= p2.1 && p1.0 >= p2.0)
+        || (p1.1 <= p2.1 && p1.1 >= p2.0)
+        || (p1.0 <= p2.0 && p1.1 >= p2.0)
+
 }
 
 pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
@@ -185,9 +204,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                     }
 
                     if let Some(period) = get_actual_period(conn) {
-                        if (period.initial_date <= _end && period.initial_date >= _start)
-                            || (period.final_date <= _end && period.final_date >= _start)
-                            || (period.initial_date <= _start && period.final_date >= _end)
+                        if (period_overlaps((period.initial_date, period.final_date), (_start, _end)))
                         {
                             eprintln!(
                                 "Invalid state: Current study period overlaps the provided period."
@@ -284,7 +301,6 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                         process::exit(1);
                     }
                 };
-
                 let new_start_date : NaiveDate = match args.contains(& "--start".to_string()) {
                     true => {
                         get_date_arg(args, "--start")
@@ -302,6 +318,14 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                         plan.final_date
                     }
                 };
+
+                for p in fetch_all_plans(conn) {
+                    if period_overlaps((new_start_date, new_end_date), (p.initial_date, p.final_date)) {
+                        eprintln!("The modified period cannot overlap another period.");
+                        eprintln!("Overlapped period: {}", p.to_string());
+                        process::exit(1);
+                    }
+                }
 
                 let descr : String = match args.contains(& "--description".to_string()) {
                     true => {
