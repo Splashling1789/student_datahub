@@ -29,7 +29,7 @@ pub fn get_actual_period(conn: &mut SqliteConnection) -> Option<Period> {
     match periods
         .filter(initial_date.le(now))
         .filter(final_date.ge(now))
-
+        .load::<Period>(conn)
     {
         Ok(period) => {
             if period.len() != 1 {
@@ -204,7 +204,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                     }
 
                     if let Some(period) = get_actual_period(conn) {
-                        if (period_overlaps((period.initial_date, period.final_date), (_start, _end)))
+                        if period_overlaps((period.initial_date, period.final_date), (_start, _end))
                         {
                             eprintln!(
                                 "Invalid state: Current study period overlaps the provided period."
