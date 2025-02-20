@@ -32,7 +32,7 @@ pub fn get_actual_period(conn: &mut SqliteConnection) -> Option<Period> {
         .load::<Period>(conn)
     {
         Ok(period) => {
-            if period.len() != 1 {
+            if period.len() > 1 {
                 debug_println!(
                     "There is more than one period ocurring now! Content: {:?}",
                     period
@@ -54,6 +54,7 @@ fn get_plan_arg(args: &mut Vec<String>) -> i32 {
             Ok(r) => r,
             Err(e) => {
                 eprintln!("Failed to parse id.");
+                debug_println!("{e}");
                 process::exit(1);
             }
         },
@@ -71,6 +72,7 @@ fn get_date_arg(args: &mut Vec<String>, find: &str) -> NaiveDate {
                 Ok(date) => date,
                 Err(e) => {
                     eprintln!("Failed to parse date. Remember using format '{}'", FORMAT);
+                    debug_println!("{e}");
                     process::exit(1);
                 }
             }
@@ -95,6 +97,7 @@ fn fetch_all_plans(conn: &mut SqliteConnection) -> Vec<Period> {
         }
         Err(e) => {
             eprintln!("Failed to load the periods.");
+            debug_println!("{e}");
             process::exit(1);
         }
     }
@@ -232,7 +235,18 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                 }
             } // start command ends here
             "remove" => {
-                let plan: i32 = get_plan_arg(args);
+                let plan: i32 = match args.contains(&"--plan".to_string()) {
+                    true => get_plan_arg(args),
+                    false => {
+                        match get_actual_period(conn) {
+                            Some(p) => p.id,
+                            None => {
+                                eprintln!("Invalid state: There is no actual period. You may want to specify it using --plan argument");
+                                process::exit(1);
+                            }
+                        }
+                    }
+                };
                 if !args.contains(&"--confirm".to_string()) {
                     let period = match periods.filter(id.eq(plan)).load::<Period>(conn) {
                         Ok(period) => match period.first().cloned() {
