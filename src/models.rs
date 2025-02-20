@@ -1,7 +1,7 @@
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
 use diesel::deserialize::FromSqlRow;
-use diesel::internal::derives::multiconnection::chrono::NaiveDate;
+use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::prelude::*;
 use diesel::row::Row;
 use diesel::sqlite::Sqlite;
@@ -51,6 +51,14 @@ impl Period {
             self.description.to_string(),
             self.id
         )
+    }
+    pub fn is_actual(&self) -> bool {
+        let now = Local::now().date_naive();
+        if now >= self.initial_date && now <= self.final_date {
+            true
+        } else {
+            false
+        }
     }
 }
 

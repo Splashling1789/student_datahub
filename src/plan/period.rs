@@ -103,15 +103,6 @@ fn fetch_all_plans(conn: &mut SqliteConnection) -> Vec<Period> {
     }
 }
 
-fn is_actual(p: &Period) -> bool {
-    let now = Local::now().date_naive();
-    if now >= p.initial_date && now <= p.final_date {
-        true
-    } else {
-        false
-    }
-}
-
 fn period_overlaps(p1 : (NaiveDate, NaiveDate), p2 : (NaiveDate, NaiveDate)) -> bool {
     (p1.0 <= p2.1 && p1.0 >= p2.0)
         || (p1.1 <= p2.1 && p1.1 >= p2.0)
@@ -140,7 +131,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                     println!("No periods created yet.");
                 }
                 for i in list {
-                    if is_actual(&i) {
+                    if i.is_actual() {
                         println!("{}", i.to_string().green());
                     } else {
                         println!("{}", i.to_string());
