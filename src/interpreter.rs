@@ -1,5 +1,4 @@
-use crate::plan::{period};
-use crate::{debug_println, usage};
+use crate::{debug_println, plan, usage};
 use diesel::{Connection, SqliteConnection};
 use std::{env, process};
 
@@ -17,7 +16,7 @@ pub fn interpret(args: &mut Vec<String>) {
             let mut conn = SqliteConnection::establish(&env::var("DATABASE_URL").unwrap()).unwrap();
             match option.trim() {
                 //"status" => status::display_status(),
-                "plan" => period::interpret(args, &mut conn),
+                "plan" => plan::interpreter::interpret(args, &mut conn),
                 //"subject" => subject::interpret(args),
                 _ => {}
             }

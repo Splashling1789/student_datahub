@@ -1,8 +1,9 @@
 use std::process;
 use diesel::internal::derives::multiconnection::chrono::NaiveDate;
+use diesel::SqliteConnection;
 use crate::{debug_println, FORMAT};
 use crate::interpreter::get_specific_arg;
-use crate::plan::usage::display_bad_usage;
+use crate::plan::*;
 
 pub fn get_plan_arg(args: &mut Vec<String>) -> i32 {
     match get_specific_arg(args, "--plan")
@@ -16,7 +17,7 @@ pub fn get_plan_arg(args: &mut Vec<String>) -> i32 {
             }
         },
         None => {
-            display_bad_usage();
+            usage::display_bad_usage();
             process::exit(1);
         }
     }
@@ -35,8 +36,37 @@ pub fn get_date_arg(args: &mut Vec<String>, find: &str) -> NaiveDate {
             }
         }
         None => {
-            display_bad_usage();
+            usage::display_bad_usage();
             process::exit(1);
+        }
+    }
+}
+
+pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
+    if args.len() == 0 {
+        usage::display_bad_usage();
+        process::exit(1);
+    } else {
+        let option = args.get(0).cloned().unwrap();
+        args.remove(0);
+        match option.trim() {
+            "list" => {
+                list::list(conn);
+            }
+            "start" => {
+                start::start_plan(conn, args);
+            }
+            "remove" => {
+                remove::remove_plan(conn, args);
+            } // remove command ends here
+            "modify" => {
+                modify::modify(conn, args);
+            }
+            k => {
+                debug_println!("No valid argument. Provided: {k}");
+                usage::display_bad_usage();
+                process::exit(1);
+            }
         }
     }
 }

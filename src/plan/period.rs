@@ -36,7 +36,7 @@ pub fn get_actual_period(conn: &mut SqliteConnection) -> Option<Period> {
     }
 }
 
-pub(crate) fn fetch_all_plans(conn: &mut SqliteConnection) -> Vec<Period> {
+pub fn fetch_all_plans(conn: &mut SqliteConnection) -> Vec<Period> {
     match periods.load::<Period>(conn) {
         Ok(p) => {
             p
@@ -45,35 +45,6 @@ pub(crate) fn fetch_all_plans(conn: &mut SqliteConnection) -> Vec<Period> {
             eprintln!("Failed to load the periods.");
             debug_println!("{e}");
             process::exit(1);
-        }
-    }
-}
-
-pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
-    if args.len() == 0 {
-        display_bad_usage();
-        process::exit(1);
-    } else {
-        let option = args.get(0).cloned().unwrap();
-        args.remove(0);
-        match option.trim() {
-            "list" => {
-                list(conn);
-            }
-            "start" => {
-                start_plan(conn, args);
-            }
-            "remove" => {
-                remove_plan(conn, args);
-            } // remove command ends here
-            "modify" => {
-                modify(conn, args);
-            }
-            k => {
-                debug_println!("No valid argument. Provided: {k}");
-                display_bad_usage();
-                process::exit(1);
-            }
         }
     }
 }

@@ -1,8 +1,8 @@
-mod interpreter;
-mod models;
 mod plan;
-mod schema;
+mod interpreter;
 mod usage;
+mod models;
+mod schema;
 
 use std::env;
 
