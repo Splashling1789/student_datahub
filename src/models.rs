@@ -1,3 +1,5 @@
+//! Module with diesel's database models.
+
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
@@ -8,6 +10,7 @@ use crate::FORMAT;
 #[diesel(table_name = crate::schema::entry)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 #[diesel(belongs_to(Subject))]
+/// Model for the dedicated time to a specific subject in a specific date.
 pub struct Entry {
     pub id: i32,
     pub date: NaiveDate,
@@ -16,6 +19,9 @@ pub struct Entry {
 }
 
 impl Entry {
+    /// Gets the period to which the entry belongs. If it doesn't belong to any period (it should), returns `None`.
+    /// # Arguments
+    /// * conn - Database connection
     pub fn get_period(&self, conn: &mut SqliteConnection) -> Option<Period> {
         periods
             .filter(initial_date.le(&self.date))
@@ -29,6 +35,7 @@ impl Entry {
 #[derive(Selectable, Queryable, Clone, Debug)]
 #[diesel(table_name = crate::schema::periods)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+/// Model for a study period (semester or similar)
 pub struct Period {
     pub id: i32,
     pub initial_date: NaiveDate,
@@ -50,6 +57,7 @@ impl Period {
             self.id
         )
     }
+    /// It determines if the period is actual (It is ocurring now)
     pub fn is_actual(&self) -> bool {
         let now = Local::now().date_naive();
         if now >= self.initial_date && now <= self.final_date {
@@ -58,10 +66,12 @@ impl Period {
             false
         }
     }
+    /// It determines whether the period is overlaping another.
     pub fn overlaps_period(&self, other: &Period) -> bool {
         let p2 = (other.initial_date, other.final_date);
         self.overlaps(p2)
     }
+    /// It determines whether the period is overlaping the period between `dates`.
     pub fn overlaps(&self, dates: (NaiveDate, NaiveDate)) -> bool {
         let p1 = (self.initial_date, self.final_date);
         (p1.0 <= dates.1 && p1.0 >= dates.0)
@@ -74,6 +84,7 @@ impl Period {
 #[diesel(table_name = crate::schema::subjects)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 #[diesel(belongs_to(Period))]
+/// Model for a subject in a specific period.
 pub struct Subject {
     pub id: i32,
     pub period_id: i32,
