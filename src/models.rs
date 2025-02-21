@@ -1,10 +1,8 @@
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
-use diesel::deserialize::FromSqlRow;
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::prelude::*;
-use diesel::row::Row;
-use diesel::sqlite::Sqlite;
+use crate::FORMAT;
 
 #[derive(Queryable, Selectable, Clone, Debug)]
 #[diesel(table_name = crate::schema::entry)]
@@ -43,10 +41,10 @@ impl Period {
         format!(
             "{} - {}\t{} (ID:{})",
             self.initial_date
-                .format(crate::plan::period::FORMAT)
+                .format(FORMAT)
                 .to_string(),
             self.final_date
-                .format(crate::plan::period::FORMAT)
+                .format(FORMAT)
                 .to_string(),
             self.description.to_string(),
             self.id
@@ -59,6 +57,16 @@ impl Period {
         } else {
             false
         }
+    }
+    pub fn overlaps_period(&self, other: &Period) -> bool {
+        let p2 = (other.initial_date, other.final_date);
+        self.overlaps(p2)
+    }
+    pub fn overlaps(&self, dates: (NaiveDate, NaiveDate)) -> bool {
+        let p1 = (self.initial_date, self.final_date);
+        (p1.0 <= dates.1 && p1.0 >= dates.0)
+            || (p1.1 <= dates.1 && p1.1 >= dates.0)
+            || (p1.0 <= dates.0 && p1.1 >= dates.0)
     }
 }
 

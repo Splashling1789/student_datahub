@@ -6,6 +6,8 @@ mod usage;
 
 use std::env;
 
+pub const FORMAT: &str = "%m-%d-%Y";
+
 macro_rules! debug_println {
     ($($arg:tt)*) => {
         if cfg!(debug_assertions) {
