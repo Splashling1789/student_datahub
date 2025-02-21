@@ -1,3 +1,7 @@
+//! # Student Datahub: register your study time.
+//! This command-line app lets you register the time dedicated to all your subjects of different 
+//! periods (semesters or similar) in a single command. It stores the data in an SQLite database,
+//! and there are commands to export it to csv format for later data analysis.
 mod plan;
 mod interpreter;
 mod usage;
@@ -6,8 +10,11 @@ mod schema;
 
 use std::env;
 
+/// Date format for [NaiveDate::fromString][NaiveDate::fromString] method
 pub const FORMAT: &str = "%m-%d-%Y";
 
+/// It prints a formatted message (just like println! would), with '\[DEBUG]' prefix and colored in yellow.
+#[macro_export]
 macro_rules! debug_println {
     ($($arg:tt)*) => {
         if cfg!(debug_assertions) {
@@ -16,7 +23,6 @@ macro_rules! debug_println {
         }
     };
 }
-pub(crate) use debug_println;
 
 fn main() {
     let mut args = env::args().collect::<Vec<String>>();
