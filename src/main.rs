@@ -7,6 +7,7 @@ mod interpreter;
 mod usage;
 mod models;
 mod schema;
+mod subject;
 
 use std::env;
 
