@@ -5,7 +5,7 @@ use crate::plan::interpreter::get_plan_arg;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{id, short_name};
 use crate::subject::usage::display_bad_usage;
-use crate::subject::{add, fetch_all_subjects, list, modify};
+use crate::subject::{add, fetch_all_subjects, list, mark, modify, remove};
 use diesel::row::NamedRow;
 use diesel::QueryDsl;
 use diesel::{ExpressionMethods, RunQueryDsl, SqliteConnection};
@@ -68,12 +68,18 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
             "modify" => {
                 modify::modify(args, conn);
             }
-            "remove" => {}
+            "remove" => {
+                remove::remove(args, conn);
+            }
             "list" => {
                 list::list(args, conn);
             }
-            "mark" => {}
-            "unmark" => {}
+            "mark" => {
+                mark::update_mark(args, conn, false);
+            }
+            "unmark" => {
+                mark::update_mark(args, conn, true);
+            }
             k => {
                 debug_println!("No valid argument. Provided: {k}");
                 display_bad_usage();

@@ -8,6 +8,8 @@ pub mod interpreter;
 mod list;
 mod modify;
 mod usage;
+mod remove;
+mod mark;
 
 fn fetch_all_subjects(conn: &mut SqliteConnection) -> Vec<Subject> {
     match subjects.load::<Subject>(conn) {
