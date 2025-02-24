@@ -5,12 +5,13 @@ use diesel::row::NamedRow;
 use crate::debug_println;
 use crate::interpreter::get_specific_arg;
 use crate::models::Subject;
+use crate::plan::interpreter::get_plan_arg;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{id, short_name};
-use crate::subject::add;
+use crate::subject::{add, fetch_all_subjects};
 use crate::subject::usage::display_bad_usage;
 
-fn get_subject(subject_arg : &String, conn : &mut SqliteConnection) -> Option<Subject> {
+pub fn get_subject(subject_arg : &String, conn : &mut SqliteConnection, plan_id: Option<i32>) -> Option<Subject> {
     match subject_arg.parse::<i32>() {
         Ok(subject_id) => {
             match subjects.filter(id.eq(subject_id)).load::<Subject>(conn) {
@@ -26,7 +27,13 @@ fn get_subject(subject_arg : &String, conn : &mut SqliteConnection) -> Option<Su
         Err(_) => {
             match subjects.filter(short_name.eq(subject_arg)).load::<Subject>(conn) {
                 Ok(s) => {
-                    s.first().cloned()
+                    if(s.len() > 1 && plan_id.is_some()) {
+                        debug_println!("There is more than one subject with same short name.");
+                        fetch_all_subjects(conn).iter().filter(|s| s.period_id == plan_id.unwrap()).collect::<Vec<Subject>>().first().cloned()
+                    }
+                    else {
+                        s.first().cloned()
+                    }
                 }
                 Err(e) => {
                     debug_println!("Failed to find subject with short name '{}': {:?}", subject_arg, e);
