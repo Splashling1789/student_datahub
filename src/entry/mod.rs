@@ -1,3 +1,3 @@
-mod add;
-mod interpreter;
+pub mod add;
+pub mod interpreter;
 mod usage;

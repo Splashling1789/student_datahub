@@ -3,7 +3,7 @@ fn get_usage_string() -> String {
         "USAGE: {} subcommand [options]\n\n\
         Avaliable subcommands:\n\
         status: Shows the current data of the study period.\n\
-        add/substract [when] (which subject) (minutes): Inserts/substracts a time entry.\n\
+        add/substract/set [when] (which subject) (minutes): Inserts/substracts a time entry.\n\
         plan list : Shows a list of all the study periods\n\
         plan start [start] (end) (description): Starts a new study period.\n\
         plan modify : Modifies current study period.\n\
