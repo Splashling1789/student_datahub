@@ -84,11 +84,17 @@ impl Period {
 #[diesel(table_name = crate::schema::subjects)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 #[diesel(belongs_to(Period))]
-/// Model for a subject in a specific period.
+/// Model for a subject in a specific subject.
 pub struct Subject {
     pub id: i32,
     pub period_id: i32,
     pub short_name: String,
     pub name: String,
     pub final_score: Option<f32>,
+}
+
+impl Subject {
+    pub fn to_string(&self) -> String {
+        format!("{} ({})", self.name, self.short_name)
+    }
 }
