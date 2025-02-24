@@ -12,22 +12,7 @@ use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{description, final_date, id, initial_date};
 
 pub fn modify(conn: &mut SqliteConnection, args: &mut Vec<String>) {
-    let plan_id: i32 = match args.contains(& "--plan".to_string()) {
-        true => {
-            get_plan_arg(args)
-        }
-        false => {
-            match get_actual_period(conn) {
-                Some(period) => {
-                    period.id
-                }
-                None => {
-                    eprintln!("No plan id was provided and there is no actual plan");
-                    process::exit(1);
-                }
-            }
-        }
-    };
+    let plan_id: i32 = get_plan_arg(args);
     let plan = match periods.filter(id.eq(plan_id)).load::<Period>(conn) {
         Ok(period) => match period.first().cloned() {
             Some(period) => period,

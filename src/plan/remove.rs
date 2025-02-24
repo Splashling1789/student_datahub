@@ -9,18 +9,7 @@ use crate::schema::periods::dsl::periods;
 use crate::schema::periods::id;
 
 pub fn remove_plan(conn: &mut SqliteConnection, args: &mut Vec<String>) {
-    let plan: i32 = match args.contains(&"--plan".to_string()) {
-        true => get_plan_arg(args),
-        false => {
-            match get_actual_period(conn) {
-                Some(p) => p.id,
-                None => {
-                    eprintln!("Invalid state: There is no actual period. You may want to specify it using --plan argument");
-                    process::exit(1);
-                }
-            }
-        }
-    };
+    let plan: i32 = get_plan_arg(args);
     if !args.contains(&"--confirm".to_string()) {
         let period = match periods.filter(id.eq(plan)).load::<Period>(conn) {
             Ok(period) => match period.first().cloned() {
