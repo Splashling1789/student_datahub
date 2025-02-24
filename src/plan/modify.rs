@@ -37,7 +37,7 @@ pub fn modify(conn: &mut SqliteConnection, args: &mut Vec<String>) {
         false => plan.final_date,
     };
 
-    for p in crate::plan::period::fetch_all_plans(conn) {
+    for p in Period::fetch_all_plans(conn) {
         if p.id != plan_id && p.overlaps((new_start_date, new_end_date)) {
             eprintln!("The modified period cannot overlap another period.");
             eprintln!("Overlapped period: {}", p.to_string());

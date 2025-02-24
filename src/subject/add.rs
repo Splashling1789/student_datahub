@@ -1,5 +1,4 @@
 use crate::plan::interpreter::get_plan_arg;
-use crate::plan::period::get_actual_period;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{name, period_id, short_name};
 use crate::subject::usage::display_bad_usage;
@@ -7,6 +6,7 @@ use diesel::dsl::insert_into;
 use diesel::ExpressionMethods;
 use diesel::{RunQueryDsl, SqliteConnection};
 use std::process;
+use crate::models::Period;
 
 pub fn add(args: &mut Vec<String>, conn: &mut SqliteConnection) {
     if args.len() < 2 {
@@ -20,7 +20,7 @@ pub fn add(args: &mut Vec<String>, conn: &mut SqliteConnection) {
             }
             get_plan_arg(args, conn)
         }
-        false => match get_actual_period(conn) {
+        false => match Period::get_actual_period(conn) {
             Some(p) => p.id,
             None => {
                 eprintln!("No current plan, nor specified.");

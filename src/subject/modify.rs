@@ -1,6 +1,5 @@
 use crate::interpreter::get_specific_arg;
 use crate::plan::interpreter::get_plan_arg;
-use crate::plan::period::get_actual_period;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{id, name, short_name};
 use crate::subject::interpreter::get_subject;

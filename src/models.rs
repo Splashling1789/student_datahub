@@ -1,10 +1,13 @@
 //! Module with diesel's database models.
 
+use std::process;
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
-use crate::FORMAT;
+use crate::{debug_println, FORMAT};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::prelude::*;
+use crate::schema::entry::date;
+use crate::schema::entry::dsl::entry;
 
 #[derive(Queryable, Selectable, Clone, Debug)]
 #[diesel(table_name = crate::schema::entry)]
@@ -29,6 +32,17 @@ impl Entry {
             .load::<Period>(conn)
             .expect("Error loading period")
             .pop()
+    }
+    
+    /// Fetches a vector with all entries from a single date.
+    /// # Arguments
+    /// * `date_to_fetch` - Date from which we want the entries
+    /// * `conn` - Database connection
+    pub fn fetch_by_day(date_to_fetch : NaiveDate, conn : &mut SqliteConnection) -> Vec<Entry> {
+        entry
+            .filter(date.eq(&date_to_fetch))
+            .load::<Entry>(conn)
+            .expect("Error loading entry")
     }
 }
 
@@ -62,6 +76,41 @@ impl Period {
             false
         }
     }
+    
+    pub fn fetch_all_plans(conn: &mut SqliteConnection) -> Vec<Period> {
+        match periods.load::<Period>(conn) {
+            Ok(p) => p,
+            Err(e) => {
+                eprintln!("Failed to load the periods.");
+                debug_println!("{e}");
+                process::exit(1);
+            }
+        }
+    }
+    
+    pub fn get_actual_period(conn: &mut SqliteConnection) -> Option<Period> {
+        let now = Local::now().date_naive();
+        match periods
+            .filter(initial_date.le(now))
+            .filter(final_date.ge(now))
+            .load::<Period>(conn)
+        {
+            Ok(period) => {
+                if period.len() > 1 {
+                    debug_println!(
+                    "There is more than one period ocurring now! Content: {:?}",
+                    period
+                );
+                }
+                period.first().cloned()
+            }
+            Err(e) => {
+                eprintln!("Failed to load: {e}");
+                process::exit(1);
+            }
+        }
+    }
+    
     /// It determines whether the period is overlaping another.
     pub fn overlaps_period(&self, other: &Period) -> bool {
         let p2 = (other.initial_date, other.final_date);

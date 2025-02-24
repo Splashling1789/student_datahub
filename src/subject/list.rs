@@ -1,13 +1,12 @@
-use crate::models::{Subject};
+use crate::models::{Period, Subject};
 use crate::plan::interpreter::get_plan_arg;
-use crate::plan::period::{fetch_all_plans, get_actual_period};
 use crate::subject::fetch_all_subjects;
 use diesel::SqliteConnection;
 use std::process;
 
 pub fn list(args: &mut Vec<String>, conn: &mut SqliteConnection) {
     let plan_id = get_plan_arg(args, conn);
-    let plan = match fetch_all_plans(conn)
+    let plan = match Period::fetch_all_plans(conn)
         .iter()
         .filter(|p| p.id == plan_id)
         .nth(0)
