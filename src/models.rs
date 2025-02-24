@@ -91,13 +91,11 @@ impl Period {
         }
     }
     
-    pub fn get_actual_period(conn: &mut SqliteConnection) -> Option<Period> {
-        let now = Local::now().date_naive();
+    pub fn get_period_from_date(conn : &mut SqliteConnection, period_date : &NaiveDate) -> Option<Period> {
         match periods
-            .filter(initial_date.le(now))
-            .filter(final_date.ge(now))
-            .load::<Period>(conn)
-        {
+            .filter(initial_date.le(period_date))
+            .filter(final_date.ge(period_date))
+            .load::<Period>(conn) {
             Ok(period) => {
                 if period.len() > 1 {
                     debug_println!(
@@ -112,6 +110,11 @@ impl Period {
                 process::exit(1);
             }
         }
+        
+    }
+
+    pub fn get_actual_period(conn: &mut SqliteConnection) -> Option<Period> {
+        Self::get_period_from_date(conn, &Local::now().date_naive())
     }
     
     /// It determines whether the period is overlaping another.
