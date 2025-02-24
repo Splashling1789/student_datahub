@@ -45,6 +45,17 @@ impl Entry {
             .load::<Entry>(conn)
             .expect("Error loading entry")
     }
+    
+    pub fn get_time_by_day_and_subject(date_to_fetch : NaiveDate, subject_to_fetch : i32, conn : &mut SqliteConnection) -> i32 {
+        match entry
+            .filter(date.eq(&date_to_fetch))
+            .filter(subject_id.eq(&subject_to_fetch))
+            .load::<Entry>(conn)
+            .expect("Failed to fetch entries").first() {
+            Some(e) => e.dedicated_time,
+            None => 0
+        }
+    }
 }
 
 #[derive(Selectable, Queryable, Clone, Debug)]

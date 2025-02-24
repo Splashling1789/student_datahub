@@ -4,7 +4,7 @@ use diesel::{RunQueryDsl, SqliteConnection};
 use std::process;
 use diesel::dsl::insert_into;
 use crate::FORMAT;
-use crate::models::Period;
+use crate::models::{Entry, Period};
 use crate::schema::entry::dsl::entry;
 use crate::schema::entry::{date, dedicated_time, subject_id};
 use crate::subject::interpreter::get_subject;
@@ -37,7 +37,7 @@ pub fn add_time(conn : &mut SqliteConnection, args : &mut Vec<String>) {
             process::exit(1);
         }
     };
-    let amount = match args.get(1).unwrap().parse::<i32>() {
+    let amount_to_add = match args.get(1).unwrap().parse::<i32>() {
         Ok(amount) => {
             if amount <= 0 {
                 eprintln!("The amount of time must be a positive integer");
@@ -52,6 +52,7 @@ pub fn add_time(conn : &mut SqliteConnection, args : &mut Vec<String>) {
             process::exit(1);
         }
     };
+    let amount = Entry::get_time_by_day_and_subject(when, subject.id, conn) + amount_to_add;
     
     match insert_into(entry).values((date.eq(when), subject_id.eq(subject.id), dedicated_time.eq(amount))).execute(conn) {
         Ok(_) => {
