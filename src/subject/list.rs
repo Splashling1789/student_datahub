@@ -9,7 +9,7 @@ pub fn list(args: &mut Vec<String>, conn: &mut SqliteConnection) {
     let plan_id = get_plan_arg(args, conn);
     let plan = match fetch_all_plans(conn)
         .iter()
-        .filter(|p| p.id != plan_id)
+        .filter(|p| p.id == plan_id)
         .nth(0)
     {
         Some(plan) => plan.clone(),
