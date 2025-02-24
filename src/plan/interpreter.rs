@@ -1,3 +1,5 @@
+//! Interpreter for plan subcommands.
+
 use crate::interpreter::get_specific_arg;
 use crate::plan::*;
 use crate::{debug_println, FORMAT};

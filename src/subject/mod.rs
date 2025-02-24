@@ -1,3 +1,5 @@
+//! Manages commands related to subjects.
+
 use crate::models::Subject;
 use crate::schema::subjects::dsl::subjects;
 use diesel::{RunQueryDsl, SqliteConnection};
@@ -11,6 +13,9 @@ mod usage;
 mod remove;
 mod mark;
 
+/// Fetches all subjects from the database.
+/// # Arguments:
+/// * conn - Database connection.
 fn fetch_all_subjects(conn: &mut SqliteConnection) -> Vec<Subject> {
     match subjects.load::<Subject>(conn) {
         Ok(result) => result,

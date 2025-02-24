@@ -1,3 +1,5 @@
+//! Interpreter for subject subcommands.
+
 use crate::debug_println;
 use crate::models::Subject;
 use crate::schema::subjects::dsl::subjects;

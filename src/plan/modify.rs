@@ -1,3 +1,5 @@
+//! Module for modifying existing periods.
+
 use crate::interpreter::get_specific_arg;
 use crate::models::Period;
 use crate::plan::interpreter::{get_date_arg, get_plan_arg};
@@ -67,7 +69,7 @@ pub fn modify(conn: &mut SqliteConnection, args: &mut Vec<String>) {
             process::exit(0);
         }
         Err(e) => {
-            eprintln!("Failed to update period: {e}");
+            eprintln!("Failed to modify period: {e}");
             process::exit(1);
         }
     }

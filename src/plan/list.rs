@@ -1,3 +1,5 @@
+//! Module for listing studying periods
+
 use crate::models::Period;
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::initial_date;
@@ -5,6 +7,9 @@ use colored::Colorize;
 use diesel::{QueryDsl, RunQueryDsl, SqliteConnection};
 use std::process;
 
+/// Lists all study periods.
+/// # Arguments
+/// * `conn` - Connection to the database.
 pub fn list(conn: &mut SqliteConnection) {
     let list = match periods.order_by(initial_date).load::<Period>(conn) {
         Ok(l) => l,
