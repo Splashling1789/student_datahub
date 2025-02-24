@@ -6,7 +6,8 @@
 use crate::{debug_println, plan, subject, usage};
 use diesel::{Connection, SqliteConnection};
 use std::{env, process};
-
+use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
+pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 /// Interprets the first command of the arguments provided and delegates the work to submodule commands
 /// # Arguments
 /// * `args` - Program arguments.
@@ -22,6 +23,14 @@ pub fn interpret(args: &mut Vec<String>) {
             debug_println!("using arg: {option}");
             dotenv::dotenv().ok();
             let mut conn = SqliteConnection::establish(&env::var("DATABASE_URL").unwrap()).unwrap();
+
+            match conn.run_pending_migrations(MIGRATIONS) {
+                Ok(_) => (),
+                Err(err) => {
+                    eprintln!("Could not run database migrations: {err}");
+                    process::exit(1);
+                }
+            }
             match option.trim() {
                 //"status" => status::display_status(),
                 "plan" => plan::interpreter::interpret(args, &mut conn),
