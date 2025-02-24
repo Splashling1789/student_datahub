@@ -2,3 +2,4 @@
 /.idea
 Cargo.lock
 .$scheme.drawio.bkp
+data.db
