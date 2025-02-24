@@ -8,7 +8,7 @@ use crate::models::Subject;
 use crate::plan::interpreter::get_plan_arg;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{id, short_name};
-use crate::subject::{add, fetch_all_subjects, modify};
+use crate::subject::{add, fetch_all_subjects, list, modify};
 use crate::subject::usage::display_bad_usage;
 
 pub fn get_subject(subject_arg : &String, conn : &mut SqliteConnection, plan_id: Option<i32>) -> Option<Subject> {
@@ -29,7 +29,7 @@ pub fn get_subject(subject_arg : &String, conn : &mut SqliteConnection, plan_id:
                 Ok(s) => {
                     if(s.len() > 1 && plan_id.is_some()) {
                         debug_println!("There is more than one subject with same short name.");
-                        fetch_all_subjects(conn).iter().filter(|s| s.period_id == plan_id.unwrap()).collect::<Vec<Subject>>().first().cloned()
+                        fetch_all_subjects(conn).iter().filter(|s| s.period_id == plan_id.unwrap()).collect::<Vec<&Subject>>().pop().cloned()
                     }
                     else {
                         s.first().cloned()
@@ -62,7 +62,7 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
 
             }
             "list" => {
-
+                list::list(args, conn);
             }
             "mark" => {
 

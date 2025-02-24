@@ -1,3 +1,4 @@
+use diesel::ExpressionMethods;
 use diesel::{RunQueryDsl, SqliteConnection};
 use std::process;
 use diesel::dsl::insert_into;
@@ -40,7 +41,7 @@ pub fn add(args : &mut Vec<String>, conn : &mut SqliteConnection) {
             }
         }
     };
-    if new_short_name.parse::<i32>().is_err() {
+    if new_short_name.parse::<i32>().is_ok() {
         eprintln!("Short name can't be a number");
         process::exit(1);
     }
@@ -51,7 +52,8 @@ pub fn add(args : &mut Vec<String>, conn : &mut SqliteConnection) {
             process::exit(1);
         }
 
-    match insert_into(subjects).values((
+    match insert_into(subjects)
+        .values((
         short_name.eq(new_short_name),
         name.eq(new_name),
         period_id.eq(new_plan_id)

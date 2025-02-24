@@ -1,9 +1,9 @@
 //! Main interpreter
-//! This module interprets the arguments given by the user and delegates 
+//! This module interprets the arguments given by the user and delegates
 //! the work to command submodules ([plan], [subject], [export]). It also provides
 //! useful functions to every command submodule.
 
-use crate::{debug_println, plan, usage};
+use crate::{debug_println, plan, subject, usage};
 use diesel::{Connection, SqliteConnection};
 use std::{env, process};
 
@@ -25,7 +25,7 @@ pub fn interpret(args: &mut Vec<String>) {
             match option.trim() {
                 //"status" => status::display_status(),
                 "plan" => plan::interpreter::interpret(args, &mut conn),
-                //"subject" => subject::interpret(args),
+                "subject" => subject::interpreter::interpret(args, &mut conn),
                 _ => {}
             }
         }
@@ -33,14 +33,17 @@ pub fn interpret(args: &mut Vec<String>) {
 }
 
 /// It searchs the value of the argument provided.
-/// # Precondition:
-/// There must be an element which content equals the `find` content.
 /// # Arguments
 /// * `args` - program arguments
 /// * `find` - argument flag to find
 pub fn get_specific_arg(args: &mut Vec<String>, find : &str) -> Option<String> {
-    args
-        .get(args.iter().enumerate().find(|a| a.1 == find).unwrap().0 + 1)
-        .cloned()
+    match args.iter().enumerate().find(|a| a.1 == find) {
+        Some(i) => {
+            args.get(i.0 + 1).cloned()
+        },
+        None => {
+            None
+        }
+    }
 }
 

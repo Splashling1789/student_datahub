@@ -4,9 +4,10 @@ use crate::models::Subject;
 use crate::schema::subjects::dsl::subjects;
 
 mod usage;
-mod interpreter;
+pub mod interpreter;
 mod add;
 mod modify;
+mod list;
 
 fn fetch_all_subjects(conn : &mut SqliteConnection) -> Vec<Subject> {
     match subjects.load::<Subject>(conn) {
