@@ -8,7 +8,7 @@ use crate::models::Subject;
 use crate::plan::interpreter::get_plan_arg;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{id, short_name};
-use crate::subject::{add, fetch_all_subjects};
+use crate::subject::{add, fetch_all_subjects, modify};
 use crate::subject::usage::display_bad_usage;
 
 pub fn get_subject(subject_arg : &String, conn : &mut SqliteConnection, plan_id: Option<i32>) -> Option<Subject> {
@@ -56,7 +56,7 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
                 add::add(args, conn);
             }
             "modify" => {
-
+                modify::modify(args, conn);
             }
             "remove" => {
 
