@@ -3,7 +3,7 @@ use std::process;
 use diesel::dsl::insert_into;
 use crate::plan::interpreter::get_plan_arg;
 use crate::subject::usage::display_bad_usage;
-use crate::plan::period::get_actual_period;
+use crate::plan::period::{get_actual_period};
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{name, short_name, period_id};
 
@@ -44,6 +44,13 @@ pub fn add(args : &mut Vec<String>, conn : &mut SqliteConnection) {
         eprintln!("Short name can't be a number");
         process::exit(1);
     }
+
+        // Two subjects from the same plan can't have the same short name.
+        if super::fetch_all_subjects(conn).iter().any(|s| s.period_id == new_plan_id && s.short_name.eq(&new_short_name)) {
+            eprintln!("A subject already exists in the period with the same short name.");
+            process::exit(1);
+        }
+
     match insert_into(subjects).values((
         short_name.eq(new_short_name),
         name.eq(new_name),
