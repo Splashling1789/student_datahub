@@ -5,8 +5,9 @@ use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
 use crate::{debug_println, FORMAT};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
+use diesel::internal::table_macro::SelectStatement;
 use diesel::prelude::*;
-use crate::schema::entry::date;
+use crate::schema::entry::{date, subject_id};
 use crate::schema::entry::dsl::entry;
 
 #[derive(Queryable, Selectable, Clone, Debug)]
@@ -76,7 +77,9 @@ impl Period {
             false
         }
     }
-    
+    /// It fetches all study periods.
+    /// # Arguments
+    /// * `conn` - Database connection
     pub fn fetch_all_plans(conn: &mut SqliteConnection) -> Vec<Period> {
         match periods.load::<Period>(conn) {
             Ok(p) => p,
@@ -145,6 +148,52 @@ impl Subject {
         }
         else {
             format!("{} ({})", self.name, self.short_name)
+        }
+    }
+    /// Gets the total dedicated time of the subject
+    /// # Arguments
+    /// * `conn` - Database connection
+    pub fn total_dedicated_time(&self, conn : &mut SqliteConnection) -> i32 {
+        entry
+            .filter(subject_id.eq(self.id))
+            .load::<Entry>(conn)
+            .expect("Error loading entry")
+            .iter()
+            .map(|e| e.dedicated_time)
+            .sum()
+    }
+    /// Gets the total dedicated time of the subject in an interval.
+    /// # Arguments
+    /// * conn - Database connection
+    /// * interval - Interval, where `None` means infinite
+    pub fn total_dedicated_time_interval(&self, conn : &mut SqliteConnection, interval : (Option<NaiveDate>, Option<NaiveDate>)) -> i32 {
+        match interval {
+            (None, None) => self.total_dedicated_time(conn),
+            (Some(k), None) =>         entry
+                .filter(subject_id.eq(self.id))
+                .filter(date.ge(k))
+                .load::<Entry>(conn)
+                .expect("Error loading entry")
+                .iter()
+                .map(|e| e.dedicated_time)
+                .sum(),
+            (None, Some(k)) => entry
+                .filter(subject_id.eq(self.id))
+                .filter(date.le(k))
+                .load::<Entry>(conn)
+                .expect("Error loading entry")
+                .iter()
+                .map(|e| e.dedicated_time)
+                .sum(),
+            (Some(k), Some(j)) => entry
+                .filter(subject_id.eq(self.id))
+                .filter(date.ge(k))
+                .filter(date.le(j))
+                .load::<Entry>(conn)
+                .expect("Error loading entry")
+                .iter()
+                .map(|e| e.dedicated_time)
+                .sum(),
         }
     }
 }
