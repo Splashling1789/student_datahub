@@ -1,4 +1,4 @@
-//! Main interpreter
+//! # Main interpreter
 //! This module interprets the arguments given by the user and delegates
 //! the work to command submodules ([plan], [subject], [export]). It also provides
 //! useful functions to every command submodule.
