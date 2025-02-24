@@ -1,7 +1,6 @@
 use crate::interpreter::get_specific_arg;
 use crate::models::Period;
 use crate::plan::interpreter::{get_date_arg, get_plan_arg};
-use crate::plan::period::get_actual_period;
 use crate::plan::usage::display_bad_usage;
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{description, final_date, id, initial_date};
@@ -12,7 +11,7 @@ use diesel::{QueryDsl, RunQueryDsl};
 use std::process;
 
 pub fn modify(conn: &mut SqliteConnection, args: &mut Vec<String>) {
-    let plan_id: i32 = get_plan_arg(args);
+    let plan_id: i32 = get_plan_arg(args, conn);
     let plan = match periods.filter(id.eq(plan_id)).load::<Period>(conn) {
         Ok(period) => match period.first().cloned() {
             Some(period) => period,

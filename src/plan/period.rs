@@ -7,12 +7,6 @@ use diesel::prelude::*;
 use diesel::SqliteConnection;
 use std::process;
 
-use crate::plan::list::list;
-use crate::plan::modify::modify;
-use crate::plan::remove::remove_plan;
-use crate::plan::start::start_plan;
-use crate::plan::usage::display_bad_usage;
-
 pub fn get_actual_period(conn: &mut SqliteConnection) -> Option<Period> {
     let now = Local::now().date_naive();
     match periods

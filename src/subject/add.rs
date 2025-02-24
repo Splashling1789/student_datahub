@@ -18,7 +18,7 @@ pub fn add(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                 display_bad_usage();
                 process::exit(1);
             }
-            get_plan_arg(args)
+            get_plan_arg(args, conn)
         }
         false => match get_actual_period(conn) {
             Some(p) => p.id,

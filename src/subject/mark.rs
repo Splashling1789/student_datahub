@@ -1,3 +1,4 @@
+use diesel::ExpressionMethods;
 use diesel::{update, QueryDsl, RunQueryDsl, SqliteConnection};
 use crate::plan::interpreter::get_plan_arg;
 use crate::subject::interpreter::get_subject;
@@ -7,17 +8,17 @@ use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{final_score, id};
 
 pub fn update_mark(args : &mut Vec<String>, conn : &mut SqliteConnection, unmark : bool) {
-    if(args.len() < 2) {
+    if (args.len() < 2 && !unmark) || (args.len() < 1 && unmark) {
         display_bad_usage();
         process::exit(1);
     }
-    let plan_id = get_plan_arg(args);
+    let plan_id = get_plan_arg(args, conn);
     match get_subject(args.get(0).unwrap(), conn, Some(plan_id)) {
         Some(s) => {
-            if(!unmark) {
+            if !unmark {
                 let mark = match args.get(1).unwrap().parse::<f32>() {
                     Ok(m) => m,
-                    Err(e) => {
+                    Err(_) => {
                         eprintln!("Mark must be a decimal or integer number (e.g.: 5.2)");
                         process::exit(1);
                     }

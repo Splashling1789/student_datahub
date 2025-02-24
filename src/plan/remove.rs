@@ -1,6 +1,5 @@
 use crate::models::Period;
 use crate::plan::interpreter::get_plan_arg;
-use crate::plan::period::get_actual_period;
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::id;
 use diesel::ExpressionMethods;
@@ -9,7 +8,7 @@ use diesel::{delete, RunQueryDsl, SqliteConnection};
 use std::process;
 
 pub fn remove_plan(conn: &mut SqliteConnection, args: &mut Vec<String>) {
-    let plan: i32 = get_plan_arg(args);
+    let plan: i32 = get_plan_arg(args, conn);
     if !args.contains(&"--confirm".to_string()) {
         let period = match periods.filter(id.eq(plan)).load::<Period>(conn) {
             Ok(period) => match period.first().cloned() {

@@ -4,8 +4,9 @@ use crate::{debug_println, FORMAT};
 use diesel::internal::derives::multiconnection::chrono::NaiveDate;
 use diesel::SqliteConnection;
 use std::process;
+use crate::plan::period::get_actual_period;
 
-pub fn get_plan_arg(args: &mut Vec<String>) -> i32 {
+pub fn get_plan_arg(args: &mut Vec<String>, conn : &mut SqliteConnection) -> i32 {
     match get_specific_arg(args, "--plan") {
         Some(plan_id) => match plan_id.parse::<i32>() {
             Ok(r) => r,
@@ -16,8 +17,13 @@ pub fn get_plan_arg(args: &mut Vec<String>) -> i32 {
             }
         },
         None => {
-            usage::display_bad_usage();
-            process::exit(1);
+            match get_actual_period(conn) {
+                Some(r) => r.id,
+                None => {
+                    eprintln!("No period specified/ocurring now");
+                    process::exit(1);
+                }
+            }
         }
     }
 }

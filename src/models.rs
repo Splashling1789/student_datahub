@@ -91,6 +91,11 @@ pub struct Subject {
 
 impl Subject {
     pub fn to_string(&self) -> String {
-        format!("{} ({})", self.name, self.short_name)
+        if self.final_score.is_some() {
+            format!("{} ({}) [{}]", self.name, self.short_name, self.final_score.unwrap())
+        }
+        else {
+            format!("{} ({})", self.name, self.short_name)
+        }
     }
 }
