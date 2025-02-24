@@ -1,11 +1,11 @@
-use diesel::internal::derives::multiconnection::chrono::{Local};
-use diesel::prelude::*;
-use std::process;
-use crate::{debug_println};
+use crate::debug_println;
 use crate::models::Period;
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
-use diesel::{SqliteConnection};
+use diesel::internal::derives::multiconnection::chrono::Local;
+use diesel::prelude::*;
+use diesel::SqliteConnection;
+use std::process;
 
 use crate::plan::list::list;
 use crate::plan::modify::modify;
@@ -38,9 +38,7 @@ pub fn get_actual_period(conn: &mut SqliteConnection) -> Option<Period> {
 
 pub fn fetch_all_plans(conn: &mut SqliteConnection) -> Vec<Period> {
     match periods.load::<Period>(conn) {
-        Ok(p) => {
-            p
-        }
+        Ok(p) => p,
         Err(e) => {
             eprintln!("Failed to load the periods.");
             debug_println!("{e}");

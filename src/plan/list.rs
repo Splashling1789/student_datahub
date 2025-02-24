@@ -1,11 +1,11 @@
-use std::process;
-use colored::Colorize;
-use diesel::{QueryDsl, RunQueryDsl, SqliteConnection};
 use crate::models::Period;
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::initial_date;
+use colored::Colorize;
+use diesel::{QueryDsl, RunQueryDsl, SqliteConnection};
+use std::process;
 
-pub fn list(conn : &mut SqliteConnection) {
+pub fn list(conn: &mut SqliteConnection) {
     let list = match periods.order_by(initial_date).load::<Period>(conn) {
         Ok(l) => l,
         Err(e) => {

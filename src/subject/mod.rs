@@ -1,15 +1,15 @@
-use std::process;
-use diesel::{RunQueryDsl, SqliteConnection};
 use crate::models::Subject;
 use crate::schema::subjects::dsl::subjects;
+use diesel::{RunQueryDsl, SqliteConnection};
+use std::process;
 
-mod usage;
-pub mod interpreter;
 mod add;
-mod modify;
+pub mod interpreter;
 mod list;
+mod modify;
+mod usage;
 
-fn fetch_all_subjects(conn : &mut SqliteConnection) -> Vec<Subject> {
+fn fetch_all_subjects(conn: &mut SqliteConnection) -> Vec<Subject> {
     match subjects.load::<Subject>(conn) {
         Ok(result) => result,
         Err(e) => {

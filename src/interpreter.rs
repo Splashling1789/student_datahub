@@ -36,14 +36,9 @@ pub fn interpret(args: &mut Vec<String>) {
 /// # Arguments
 /// * `args` - program arguments
 /// * `find` - argument flag to find
-pub fn get_specific_arg(args: &mut Vec<String>, find : &str) -> Option<String> {
+pub fn get_specific_arg(args: &mut Vec<String>, find: &str) -> Option<String> {
     match args.iter().enumerate().find(|a| a.1 == find) {
-        Some(i) => {
-            args.get(i.0 + 1).cloned()
-        },
-        None => {
-            None
-        }
+        Some(i) => args.get(i.0 + 1).cloned(),
+        None => None,
     }
 }
-

@@ -2,9 +2,9 @@
 
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
+use crate::FORMAT;
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::prelude::*;
-use crate::FORMAT;
 
 #[derive(Queryable, Selectable, Clone, Debug)]
 #[diesel(table_name = crate::schema::entry)]
@@ -47,12 +47,8 @@ impl Period {
     pub fn to_string(&self) -> String {
         format!(
             "{} - {}\t{} (ID:{})",
-            self.initial_date
-                .format(FORMAT)
-                .to_string(),
-            self.final_date
-                .format(FORMAT)
-                .to_string(),
+            self.initial_date.format(FORMAT).to_string(),
+            self.final_date.format(FORMAT).to_string(),
             self.description.to_string(),
             self.id
         )

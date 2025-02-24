@@ -1,12 +1,12 @@
-use diesel::ExpressionMethods;
-use diesel::QueryDsl;
-use std::process;
-use diesel::{delete, RunQueryDsl, SqliteConnection};
 use crate::models::Period;
 use crate::plan::interpreter::get_plan_arg;
 use crate::plan::period::get_actual_period;
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::id;
+use diesel::ExpressionMethods;
+use diesel::QueryDsl;
+use diesel::{delete, RunQueryDsl, SqliteConnection};
+use std::process;
 
 pub fn remove_plan(conn: &mut SqliteConnection, args: &mut Vec<String>) {
     let plan: i32 = get_plan_arg(args);
@@ -27,11 +27,10 @@ pub fn remove_plan(conn: &mut SqliteConnection, args: &mut Vec<String>) {
         println!("{}", period.to_string());
         println!("Are you sure you want to remove the study plan? [y/n]: ");
         let mut response = String::new();
-        std::io::stdin().read_line(&mut response)
-            .expect("Failed to read line. If this keeps ocurring, use --confirm to skip stdin readlines");
-        if response.to_lowercase().trim() != "y"
-            && response.to_lowercase().trim() != "yes"
-        {
+        std::io::stdin().read_line(&mut response).expect(
+            "Failed to read line. If this keeps ocurring, use --confirm to skip stdin readlines",
+        );
+        if response.to_lowercase().trim() != "y" && response.to_lowercase().trim() != "yes" {
             println!("Aborting");
             process::exit(0);
         }
