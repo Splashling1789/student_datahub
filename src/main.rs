@@ -8,6 +8,7 @@ mod plan;
 mod schema;
 mod subject;
 mod usage;
+mod entry;
 
 use std::env;
 
