@@ -1,4 +1,4 @@
-mod period;
+pub mod period;
 mod usage;
 pub mod interpreter;
 mod list;
