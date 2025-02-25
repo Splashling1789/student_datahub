@@ -1,15 +1,22 @@
-use diesel::{update, ExpressionMethods, QueryDsl};
-use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
-use diesel::{RunQueryDsl, SqliteConnection};
+use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 use std::process;
-use diesel::dsl::insert_into;
+use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
+use diesel::{insert_into, SqliteConnection};
+use diesel::dsl::delete;
 use crate::FORMAT;
 use crate::models::{Entry, Period};
-use crate::schema::entry::dsl::entry;
 use crate::schema::entry::{date, dedicated_time, subject_id};
+use crate::schema::entry::dsl::entry;
 use crate::subject::interpreter::get_subject;
 
-pub fn add_time(conn : &mut SqliteConnection, args : &mut Vec<String>) {
+fn max(a : i32, b : i32) -> i32 {
+    match a < b {
+        true => b,
+        false => a,
+    }
+}
+
+pub fn subtract_time(conn : &mut SqliteConnection, args : &mut Vec<String>) {
     let when: NaiveDate = match args.len() {
         3 => match NaiveDate::parse_from_str(&*args.get(0).unwrap().clone(), FORMAT) {
             Ok(when) => {
@@ -52,26 +59,27 @@ pub fn add_time(conn : &mut SqliteConnection, args : &mut Vec<String>) {
             process::exit(1);
         }
     };
-
-    
-    if amount_to_add == 0 {
-        match insert_into(entry).values((date.eq(when), subject_id.eq(subject.id), dedicated_time.eq(0))).execute(conn) {
-            Ok(_) => {}
+    let amount = max(Entry::get_time_by_day_and_subject(when, subject.id, conn) - amount_to_add, 0);
+    if amount == 0 {
+        match delete(entry.filter(subject_id.eq(subject.id)).filter(date.eq(when))).execute(conn) {
+            Ok(_) => {
+                println!("Entry added successfully. Current amount: {amount}");
+            }
             Err(e) => {
-                eprintln!("Failed to insert entry: {e}");
+                eprintln!("Failed to delete entry: {e}");
                 process::exit(1);
             }
         }
     }
-    let amount = Entry::get_time_by_day_and_subject(when, subject.id, conn) + amount_to_add;
-    
-    match update(entry.filter(date.eq(when)).filter(date.eq(when))).set(( dedicated_time.eq(amount))).execute(conn) {
-        Ok(_) => {
-            println!("Entry added successfully. Current amount: {amount}");
-        }
-        Err(e) => {
-            eprintln!("Failed to insert entry: {e}");
-            process::exit(1);
+    else {
+        match insert_into(entry).values((date.eq(when), subject_id.eq(subject.id), dedicated_time.eq(amount))).execute(conn) {
+            Ok(_) => {
+                println!("Entry added successfully. Current amount: {amount}");
+            }
+            Err(e) => {
+                eprintln!("Failed to insert entry: {e}");
+                process::exit(1);
+            }
         }
     }
 }

@@ -36,6 +36,8 @@ pub fn interpret(args: &mut Vec<String>) {
                 "plan" => plan::interpreter::interpret(args, &mut conn),
                 "subject" => subject::interpreter::interpret(args, &mut conn),
                 "add" => entry::add::add_time(&mut conn, args),
+                "substract" => entry::substract::subtract_time(&mut conn, args),
+                "set" => entry::set::set_time(&mut conn, args),
                 _ => {}
             }
         }
