@@ -77,7 +77,10 @@ pub fn get_specific_arg(args: &mut Vec<String>, find: &str) -> Option<String> {
     }
 }
 
-
+/// Prints the given string and waits for user input. If something different to 'y' is entered, it will end the program
+/// with code 0.
+/// # Arguments
+/// * `warn` - Warn to print before stdin wait.
 pub fn request_confirmation(warn : &str) {
     println!("{warn}");
     let mut response = String::new();
