@@ -6,6 +6,7 @@ use diesel::ExpressionMethods;
 use diesel::QueryDsl;
 use diesel::{delete, RunQueryDsl, SqliteConnection};
 use std::process;
+use crate::interpreter::request_confirmation;
 
 pub fn remove_plan(conn: &mut SqliteConnection, args: &mut Vec<String>) {
     let plan: i32 = get_plan_arg(args, conn);
@@ -24,15 +25,7 @@ pub fn remove_plan(conn: &mut SqliteConnection, args: &mut Vec<String>) {
             }
         };
         println!("{}", period.to_string());
-        println!("Are you sure you want to remove the study plan? [y/n]: ");
-        let mut response = String::new();
-        std::io::stdin().read_line(&mut response).expect(
-            "Failed to read line. If this keeps ocurring, use --confirm to skip stdin readlines",
-        );
-        if response.to_lowercase().trim() != "y" && response.to_lowercase().trim() != "yes" {
-            println!("Aborting");
-            process::exit(0);
-        }
+        request_confirmation("Are you sure you want to remove the study plan? [y/n]:");
     }
 
     match delete(periods.filter(id.eq(plan))).execute(conn) {

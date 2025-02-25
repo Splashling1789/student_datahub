@@ -7,6 +7,7 @@ use diesel::ExpressionMethods;
 use diesel::QueryDsl;
 use diesel::{delete, RunQueryDsl, SqliteConnection};
 use std::process;
+use crate::interpreter::request_confirmation;
 
 pub fn remove(args : &mut Vec<String>, conn : &mut SqliteConnection) {
     if args.len() < 1 {
@@ -16,9 +17,12 @@ pub fn remove(args : &mut Vec<String>, conn : &mut SqliteConnection) {
     let plan_id = get_plan_arg(args, conn);
     match get_subject(args.get(0).unwrap(), conn, Some(plan_id)) {
         Some(subj) => {
+            if(!args.contains(&"--confirm".to_string())) {
+                println!("{}", subj.to_string());
+                request_confirmation("Are you sure you want to delete this subject? [y/n]");
+            }
             match delete(subjects.filter(id.eq(subj.id))).execute(conn) {
                 Ok(_) => {
-                    //TODO: Request confirmation through stdin
                     println!("Subject removed succesfully");
                 }
                 Err(e) => {

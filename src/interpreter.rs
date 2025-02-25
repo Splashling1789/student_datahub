@@ -76,3 +76,16 @@ pub fn get_specific_arg(args: &mut Vec<String>, find: &str) -> Option<String> {
         None => None,
     }
 }
+
+
+pub fn request_confirmation(warn : &str) {
+    println!("{warn}");
+    let mut response = String::new();
+    std::io::stdin().read_line(&mut response).expect(
+        "Failed to read line. If this keeps ocurring, use --confirm to skip stdin readlines",
+    );
+    if response.to_lowercase().trim() != "y" && response.to_lowercase().trim() != "yes" {
+        println!("Aborting");
+        process::exit(0);
+    }
+}
