@@ -17,7 +17,7 @@ pub fn remove(args : &mut Vec<String>, conn : &mut SqliteConnection) {
     let plan_id = get_plan_arg(args, conn);
     match get_subject(args.get(0).unwrap(), conn, Some(plan_id)) {
         Some(subj) => {
-            if(!args.contains(&"--confirm".to_string())) {
+            if !args.contains(&"--confirm".to_string()) {
                 println!("{}", subj.to_string());
                 request_confirmation("Are you sure you want to delete this subject? [y/n]");
             }
