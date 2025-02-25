@@ -52,9 +52,10 @@ pub fn add_time(conn : &mut SqliteConnection, args : &mut Vec<String>) {
             process::exit(1);
         }
     };
-
+    let amount = Entry::get_time_by_day_and_subject(when, subject.id, conn) + amount_to_add;
     
-    if amount_to_add == 0 {
+    // If there was no previous entries, it creates one.
+    if amount == amount_to_add {
         match insert_into(entry).values((date.eq(when), subject_id.eq(subject.id), dedicated_time.eq(0))).execute(conn) {
             Ok(_) => {}
             Err(e) => {
@@ -63,7 +64,6 @@ pub fn add_time(conn : &mut SqliteConnection, args : &mut Vec<String>) {
             }
         }
     }
-    let amount = Entry::get_time_by_day_and_subject(when, subject.id, conn) + amount_to_add;
     
     match update(entry.filter(date.eq(when)).filter(date.eq(when))).set(( dedicated_time.eq(amount))).execute(conn) {
         Ok(_) => {

@@ -1,4 +1,4 @@
-use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
+use diesel::{update, ExpressionMethods, QueryDsl, RunQueryDsl};
 use std::process;
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::{insert_into, SqliteConnection};
@@ -72,7 +72,7 @@ pub fn subtract_time(conn : &mut SqliteConnection, args : &mut Vec<String>) {
         }
     }
     else {
-        match insert_into(entry).values((date.eq(when), subject_id.eq(subject.id), dedicated_time.eq(amount))).execute(conn) {
+        match update(entry.filter(date.eq(when)).filter(subject_id.eq(subject.id))).set(dedicated_time.eq(amount)).execute(conn) {
             Ok(_) => {
                 println!("Entry added successfully. Current amount: {amount}");
             }

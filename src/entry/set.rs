@@ -40,8 +40,8 @@ pub fn set_time(conn : &mut SqliteConnection, args : &mut Vec<String>) {
     };
     let amount = match args.get(1).unwrap().parse::<i32>() {
         Ok(amount) => {
-            if amount <= 0 {
-                eprintln!("The amount of time must be a positive integer");
+            if amount < 0 {
+                eprintln!("The amount of time must be a positive integer or zero");
                 process::exit(1);
             }
             else {
@@ -49,7 +49,7 @@ pub fn set_time(conn : &mut SqliteConnection, args : &mut Vec<String>) {
             }
         },
         Err(e) => {
-            eprintln!("The amount of time must be a positive integer");
+            eprintln!("The amount of time must be a positive integer or zero");
             process::exit(1);
         }
     };
@@ -66,21 +66,27 @@ pub fn set_time(conn : &mut SqliteConnection, args : &mut Vec<String>) {
     }
     else {
         match update(entry.filter(date.eq(when)).filter(subject_id.eq(subject.id))).set(( dedicated_time.eq(amount))).execute(conn) {
-            Ok(_) => {
-                println!("Entry set successfully. Current amount: {amount}");
-            }
-            Err(_) => {
-                match insert_into(entry).values((date.eq(when), subject_id.eq(subject.id))).execute(conn) {
-                    Ok(_) => {
-                        println!("Entry set successfully. Current amount: {amount}");
-                    }
-                    Err(e) => {
-                        eprintln!("Failed to set entry: {e}");
-                        process::exit(1);
+            Ok(r) => {
+                if r == 0 {
+                    match insert_into(entry).values((date.eq(when), subject_id.eq(subject.id), dedicated_time.eq(amount))).execute(conn) {
+                        Ok(_) => {
+                            println!("Entry set successfully. Current amount: {amount}");
+                        }
+                        Err(e) => {
+                            eprintln!("Failed to set entry: {e}");
+                            process::exit(1);
+                        }
                     }
                 }
+                else {
+                    println!("Entry set successfully. Current amount: {amount}");
+                }
+            }
+            Err(e) => {
+                eprintln!("Failed to set entry: {e}");
+                process::exit(1);
             }
         }
     }
-    
+
 }
