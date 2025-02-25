@@ -1,14 +1,14 @@
 //! Module with diesel's database models.
 
-use std::process;
+use crate::schema::entry::dsl::entry;
+use crate::schema::entry::{date, subject_id};
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
 use crate::{debug_println, FORMAT};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::internal::table_macro::SelectStatement;
 use diesel::prelude::*;
-use crate::schema::entry::{date, subject_id};
-use crate::schema::entry::dsl::entry;
+use std::process;
 
 #[derive(Queryable, Selectable, Clone, Debug)]
 #[diesel(table_name = crate::schema::entry)]

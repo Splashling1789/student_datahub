@@ -1,3 +1,4 @@
+use crate::models::Period;
 use crate::plan::interpreter::get_plan_arg;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{name, period_id, short_name};
@@ -6,7 +7,6 @@ use diesel::dsl::insert_into;
 use diesel::ExpressionMethods;
 use diesel::{RunQueryDsl, SqliteConnection};
 use std::process;
-use crate::models::Period;
 
 pub fn add(args: &mut Vec<String>, conn: &mut SqliteConnection) {
     if args.len() < 2 {

@@ -1,11 +1,11 @@
-use diesel::ExpressionMethods;
-use diesel::{update, QueryDsl, RunQueryDsl, SqliteConnection};
 use crate::plan::interpreter::get_plan_arg;
-use crate::subject::interpreter::get_subject;
-use crate::subject::usage::display_bad_usage;
-use std::process;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{final_score, id};
+use crate::subject::interpreter::get_subject;
+use crate::subject::usage::display_bad_usage;
+use diesel::ExpressionMethods;
+use diesel::{update, QueryDsl, RunQueryDsl, SqliteConnection};
+use std::process;
 
 pub fn update_mark(args : &mut Vec<String>, conn : &mut SqliteConnection, unmark : bool) {
     if (args.len() < 2 && !unmark) || (args.len() < 1 && unmark) {

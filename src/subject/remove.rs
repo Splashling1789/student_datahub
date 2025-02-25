@@ -1,12 +1,12 @@
-use diesel::ExpressionMethods;
-use diesel::QueryDsl;
-use std::process;
-use diesel::{delete, RunQueryDsl, SqliteConnection};
 use crate::plan::interpreter::get_plan_arg;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::id;
 use crate::subject::interpreter::get_subject;
 use crate::subject::usage::display_bad_usage;
+use diesel::ExpressionMethods;
+use diesel::QueryDsl;
+use diesel::{delete, RunQueryDsl, SqliteConnection};
+use std::process;
 
 pub fn remove(args : &mut Vec<String>, conn : &mut SqliteConnection) {
     if args.len() < 1 {

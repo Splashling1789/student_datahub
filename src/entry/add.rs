@@ -1,13 +1,13 @@
-use diesel::{update, ExpressionMethods, QueryDsl};
-use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
-use diesel::{RunQueryDsl, SqliteConnection};
-use std::process;
-use diesel::dsl::insert_into;
-use crate::FORMAT;
 use crate::models::{Entry, Period};
 use crate::schema::entry::dsl::entry;
 use crate::schema::entry::{date, dedicated_time, subject_id};
 use crate::subject::interpreter::get_subject;
+use crate::FORMAT;
+use diesel::dsl::insert_into;
+use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
+use diesel::{update, ExpressionMethods, QueryDsl};
+use diesel::{RunQueryDsl, SqliteConnection};
+use std::process;
 
 pub fn add_time(conn : &mut SqliteConnection, args : &mut Vec<String>) {
     let when: NaiveDate = match args.len() {

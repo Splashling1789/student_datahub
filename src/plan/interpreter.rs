@@ -1,12 +1,12 @@
 //! Interpreter for plan subcommands.
 
 use crate::interpreter::get_specific_arg;
+use crate::models::Period;
 use crate::plan::*;
 use crate::{debug_println, FORMAT};
 use diesel::internal::derives::multiconnection::chrono::NaiveDate;
 use diesel::SqliteConnection;
 use std::process;
-use crate::models::Period;
 
 pub fn get_plan_arg(args: &mut Vec<String>, conn : &mut SqliteConnection) -> i32 {
     match get_specific_arg(args, "--plan") {

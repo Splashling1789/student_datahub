@@ -1,13 +1,13 @@
-use diesel::{update, ExpressionMethods, QueryDsl, RunQueryDsl};
-use std::process;
-use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
-use diesel::{insert_into, SqliteConnection};
-use diesel::dsl::delete;
-use crate::FORMAT;
 use crate::models::{Entry, Period};
-use crate::schema::entry::{date, dedicated_time, subject_id};
 use crate::schema::entry::dsl::entry;
+use crate::schema::entry::{date, dedicated_time, subject_id};
 use crate::subject::interpreter::get_subject;
+use crate::FORMAT;
+use diesel::dsl::delete;
+use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
+use diesel::{update, ExpressionMethods, QueryDsl, RunQueryDsl};
+use diesel::SqliteConnection;
+use std::process;
 
 fn max(a : i32, b : i32) -> i32 {
     match a < b {

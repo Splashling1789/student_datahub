@@ -1,3 +1,4 @@
+use crate::models::Period;
 use crate::plan::usage::display_bad_usage;
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{description, final_date, initial_date};
@@ -6,7 +7,6 @@ use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::ExpressionMethods;
 use diesel::{insert_into, RunQueryDsl, SqliteConnection};
 use std::process;
-use crate::models::Period;
 
 pub fn start_plan(conn: &mut SqliteConnection, args: &mut Vec<String>) {
     if args.len() < 2 {

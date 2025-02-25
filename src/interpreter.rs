@@ -5,9 +5,9 @@
 
 use crate::{debug_println, entry, plan, subject, usage};
 use diesel::{Connection, SqliteConnection};
-use std::{env, fs, process};
-use std::path::Path;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
+use std::path::Path;
+use std::{env, fs, process};
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
 pub fn get_data_dir() -> String {
@@ -40,7 +40,6 @@ pub fn interpret(args: &mut Vec<String>) {
             args.remove(0);
             debug_println!("using arg: {option}");
             dotenv::dotenv().ok();
-            let home = env::var("HOME").expect("$HOME not set");
             let connection_string = format!("{}{}", get_data_dir(), env::var("DATABASE_URL").expect("Failed to get DATABASE_URL from .env file"));
             debug_println!("connecting to {connection_string}");
             let mut conn = SqliteConnection::establish(&connection_string).unwrap();
