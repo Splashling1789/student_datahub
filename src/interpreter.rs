@@ -8,6 +8,8 @@ use diesel::{Connection, SqliteConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use std::path::Path;
 use std::{env, fs, process};
+use crate::entry::Mode;
+
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
 pub fn get_data_dir() -> String {
@@ -55,9 +57,9 @@ pub fn interpret(args: &mut Vec<String>) {
                 //"status" => status::display_status(),
                 "plan" => plan::interpreter::interpret(args, &mut conn),
                 "subject" => subject::interpreter::interpret(args, &mut conn),
-                "add" => entry::add::add_time(&mut conn, args),
-                "substract" => entry::substract::subtract_time(&mut conn, args),
-                "set" => entry::set::set_time(&mut conn, args),
+                "add" => entry::time_setter(&mut conn, args, Mode::ADD),
+                "substract" => entry::time_setter(&mut conn, args, Mode::SUBSTRACT),
+                "set" => entry::time_setter(&mut conn, args, Mode::SET),
                 _ => {}
             }
         }

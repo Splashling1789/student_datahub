@@ -1,10 +1,8 @@
-use crate::models::{Entry, Period};
+use crate::models::{Entry, Subject};
 use crate::schema::entry::dsl::entry;
 use crate::schema::entry::{date, dedicated_time, subject_id};
-use crate::subject::interpreter::get_subject;
-use crate::FORMAT;
 use diesel::dsl::delete;
-use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
+use diesel::internal::derives::multiconnection::chrono::{NaiveDate};
 use diesel::{update, ExpressionMethods, QueryDsl, RunQueryDsl};
 use diesel::SqliteConnection;
 use std::process;
@@ -16,50 +14,9 @@ fn max(a : i32, b : i32) -> i32 {
     }
 }
 
-pub fn subtract_time(conn : &mut SqliteConnection, args : &mut Vec<String>) {
-    let when: NaiveDate = match args.len() {
-        3 => match NaiveDate::parse_from_str(&*args.get(0).unwrap().clone(), FORMAT) {
-            Ok(when) => {
-                args.remove(0);
-                when
-            },
-            Err(e) => {
-                eprintln!("Error parsing date. Remember using format {FORMAT}");
-                process::exit(1);
-            },
-        },
-        _ => Local::now().naive_local().date()
-    };
-    let plan_id = match Period::get_period_from_date(conn, &when) {
-        Some(plan) => plan.id,
-        None => {
-            eprintln!("There is no study plan ocurring on the current/specified date.");
-            process::exit(1);
-        }
-    };
-    let subject = match get_subject(args.get(0).unwrap(), conn, Some(plan_id)) {
-        Some(subject) => subject,
-        None => {
-            eprintln!("There is no subject with that id or short name");
-            process::exit(1);
-        }
-    };
-    let amount_to_add = match args.get(1).unwrap().parse::<i32>() {
-        Ok(amount) => {
-            if amount <= 0 {
-                eprintln!("The amount of time must be a positive integer");
-                process::exit(1);
-            }
-            else {
-                amount
-            }
-        },
-        Err(e) => {
-            eprintln!("The amount of time must be a positive integer");
-            process::exit(1);
-        }
-    };
-    let amount = max(Entry::get_time_by_day_and_subject(when, subject.id, conn) - amount_to_add, 0);
+pub fn subtract_time(conn : &mut SqliteConnection, subject: Subject, when:NaiveDate, amount_to_substract: i32) {
+    
+    let amount = max(Entry::get_time_by_day_and_subject(when, subject.id, conn) - amount_to_substract, 0);
     if amount == 0 {
         match delete(entry.filter(subject_id.eq(subject.id)).filter(date.eq(when))).execute(conn) {
             Ok(_) => {
