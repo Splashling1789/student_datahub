@@ -7,6 +7,7 @@ use diesel::dsl::insert_into;
 use diesel::ExpressionMethods;
 use diesel::{RunQueryDsl, SqliteConnection};
 use std::process;
+use crate::debug_println;
 
 pub fn add(args: &mut Vec<String>, conn: &mut SqliteConnection) {
     let new_plan_id = get_plan_arg(args, conn);
@@ -14,14 +15,8 @@ pub fn add(args: &mut Vec<String>, conn: &mut SqliteConnection) {
         display_bad_usage();
         process::exit(1);
     }
-
-    let (new_short_name, new_name) = match args.get(0).unwrap().trim() {
-        "--plan" => (args.get(2).unwrap().clone(), args.get(3).unwrap().clone()),
-        k => match args.get(1).unwrap().trim() {
-            "--plan" => (String::from(k), args.get(3).unwrap().clone()),
-            j => (String::from(k), String::from(j)),
-        },
-    };
+    debug_println!("{:?}", args);
+    let (new_short_name, new_name) =  (args.get(0).unwrap().clone(), args.get(1).unwrap().clone());
     if new_short_name.parse::<i32>().is_ok() {
         eprintln!("Short name can't be a number");
         process::exit(1);

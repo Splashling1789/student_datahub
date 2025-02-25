@@ -21,7 +21,7 @@ pub fn get_plan_arg(args: &mut Vec<String>, conn : &mut SqliteConnection) -> i32
                 }
                 if let Some(index) = index {
                     args.remove(index);
-                    args.remove(index+1);
+                    args.remove(index);
                 }
                 else {
                     debug_println!("get_plan_arg: no index to remove was found.");
