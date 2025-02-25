@@ -1,4 +1,4 @@
-// @generated automatically by Diesel CLI.
+//! Module generated automatically by Diesel CLI
 
 diesel::table! {
     entry (id) {
