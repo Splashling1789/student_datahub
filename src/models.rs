@@ -44,7 +44,12 @@ impl Entry {
             .load::<Entry>(conn)
             .expect("Error loading entry")
     }
-    
+
+    /// Gets the dedicated time to a subject in a determined day. If there was no entry regarding that date, returns zero.
+    /// # Arguments
+    /// * `date_to_fetch` - date to search.
+    /// * `subject_to_fetch` - subject id to search.
+    /// * `conn` - connection to the database.
     pub fn get_time_by_day_and_subject(date_to_fetch : NaiveDate, subject_to_fetch : i32, conn : &mut SqliteConnection) -> i32 {
         match entry
             .filter(date.eq(&date_to_fetch))
@@ -69,6 +74,7 @@ pub struct Period {
 }
 
 impl Period {
+    /// Gets a formatted string with relevant data of the period.
     pub fn to_string(&self) -> String {
         format!(
             "{} - {}\t{} (ID:{})",
@@ -100,7 +106,11 @@ impl Period {
             }
         }
     }
-    
+
+    /// Gets the period given a date. Returns None if there isn't any.
+    /// # Arguments
+    /// * `conn` - Database connection.
+    /// * `period_date` - Date of the period.
     pub fn get_period_from_date(conn : &mut SqliteConnection, period_date : &NaiveDate) -> Option<Period> {
         match periods
             .filter(initial_date.le(period_date))
@@ -123,6 +133,9 @@ impl Period {
         
     }
 
+    /// Gets the period ocurring now.
+    /// # Arguments
+    /// * `conn` - Database connection
     pub fn get_actual_period(conn: &mut SqliteConnection) -> Option<Period> {
         Self::get_period_from_date(conn, &Local::now().date_naive())
     }
@@ -133,6 +146,8 @@ impl Period {
         self.overlaps(p2)
     }
     /// It determines whether the period is overlaping the period between `dates`.
+    /// # Arguments
+    /// * `dates` - Date interval (start, end)
     pub fn overlaps(&self, dates: (NaiveDate, NaiveDate)) -> bool {
         let p1 = (self.initial_date, self.final_date);
         (p1.0 <= dates.1 && p1.0 >= dates.0)
@@ -155,6 +170,7 @@ pub struct Subject {
 }
 
 impl Subject {
+    /// Gets a formatted string with relevant data of the subject.
     pub fn to_string(&self) -> String {
         if self.final_score.is_some() {
             format!("{} ({}) [{}]", self.name, self.short_name, self.final_score.unwrap())
@@ -177,8 +193,8 @@ impl Subject {
     }
     /// Gets the total dedicated time of the subject in an interval.
     /// # Arguments
-    /// * conn - Database connection
-    /// * interval - Interval, where `None` means infinite
+    /// * `conn` - Database connection
+    /// * `interval` - Interval, where [None] means infinite
     pub fn total_dedicated_time_interval(&self, conn : &mut SqliteConnection, interval : (Option<NaiveDate>, Option<NaiveDate>)) -> i32 {
         match interval {
             (None, None) => self.total_dedicated_time(conn),
