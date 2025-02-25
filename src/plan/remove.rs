@@ -11,19 +11,13 @@ use crate::interpreter::request_confirmation;
 pub fn remove_plan(conn: &mut SqliteConnection, args: &mut Vec<String>) {
     let plan: i32 = get_plan_arg(args, conn);
     if !args.contains(&"--confirm".to_string()) {
-        let period = match periods.filter(id.eq(plan)).load::<Period>(conn) {
-            Ok(period) => match period.first().cloned() {
+        let period = match Period::from_id(conn, plan) {
                 Some(period) => period,
                 None => {
                     eprintln!("Plan not found");
                     process::exit(1);
                 }
-            },
-            Err(e) => {
-                println!("Failed to fetch period: {e}");
-                process::exit(1);
-            }
-        };
+            };
         println!("{}", period.to_string());
         request_confirmation("Are you sure you want to remove the study plan? [y/n]:");
     }

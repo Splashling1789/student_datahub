@@ -111,7 +111,7 @@ impl Period {
     /// # Arguments
     /// * `conn` - Database connection.
     /// * `period_date` - Date of the period.
-    pub fn get_period_from_date(conn : &mut SqliteConnection, period_date : &NaiveDate) -> Option<Period> {
+    pub fn from_date(conn : &mut SqliteConnection, period_date : &NaiveDate) -> Option<Period> {
         match periods
             .filter(initial_date.le(period_date))
             .filter(final_date.ge(period_date))
@@ -130,14 +130,29 @@ impl Period {
                 process::exit(1);
             }
         }
-        
+    }
+    
+    /// Gets the period given its id. Returns None if there isn't any.
+    /// # Arguments
+    /// * `conn` - Database connection
+    /// * `id_to_fetch` - Period id.
+    pub fn from_id(conn: &mut SqliteConnection, id_to_fetch: i32) -> Option<Period> {
+        match periods.filter(crate::schema::periods::id.eq(id_to_fetch)).load::<Period>(conn) {
+            Ok(p) => {
+                p.first().cloned()
+            }
+            Err(e) => {
+                eprintln!("Failed to fetch period: {e}");
+                process::exit(1);
+            }
+        }
     }
 
     /// Gets the period ocurring now.
     /// # Arguments
     /// * `conn` - Database connection
     pub fn get_actual_period(conn: &mut SqliteConnection) -> Option<Period> {
-        Self::get_period_from_date(conn, &Local::now().date_naive())
+        Self::from_date(conn, &Local::now().date_naive())
     }
     
     /// It determines whether the period is overlaping another.

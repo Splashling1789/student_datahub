@@ -11,7 +11,23 @@ use std::process;
 pub fn get_plan_arg(args: &mut Vec<String>, conn : &mut SqliteConnection) -> i32 {
     match get_specific_arg(args, "--plan") {
         Some(plan_id) => match plan_id.parse::<i32>() {
-            Ok(r) => r,
+            Ok(r) => {
+                let mut index = None;
+                for (i, a) in args.iter_mut().enumerate() {
+                    if a.trim() == "--plan" {
+                        index = Some(i);
+                        break;
+                    }
+                }
+                if let Some(index) = index {
+                    args.remove(index);
+                    args.remove(index+1);
+                }
+                else {
+                    debug_println!("get_plan_arg: no index to remove was found.");
+                }
+                r
+            },
             Err(e) => {
                 eprintln!("Failed to parse id.");
                 debug_println!("{e}");

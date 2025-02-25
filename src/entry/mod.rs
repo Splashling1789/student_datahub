@@ -38,7 +38,7 @@ pub fn time_setter(conn : &mut SqliteConnection, args:  &mut Vec<String>, mode :
         display_bad_usage();
         process::exit(1);
     }
-    let plan_id = match Period::get_period_from_date(conn, &when) {
+    let plan_id = match Period::from_date(conn, &when) {
         Some(plan) => plan.id,
         None => {
             eprintln!("There is no study plan ocurring on the current/specified date.");

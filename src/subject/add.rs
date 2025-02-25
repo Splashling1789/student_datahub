@@ -9,26 +9,12 @@ use diesel::{RunQueryDsl, SqliteConnection};
 use std::process;
 
 pub fn add(args: &mut Vec<String>, conn: &mut SqliteConnection) {
+    let new_plan_id = get_plan_arg(args, conn);
     if args.len() < 2 {
         display_bad_usage();
         process::exit(1);
     }
-    let new_plan_id = match args.contains(&String::from("--plan")) {
-        true => {
-            if args.len() < 3 {
-                display_bad_usage();
-                process::exit(1);
-            }
-            get_plan_arg(args, conn)
-        }
-        false => match Period::get_actual_period(conn) {
-            Some(p) => p.id,
-            None => {
-                eprintln!("No current plan, nor specified.");
-                process::exit(1);
-            }
-        },
-    };
+
     let (new_short_name, new_name) = match args.get(0).unwrap().trim() {
         "--plan" => (args.get(2).unwrap().clone(), args.get(3).unwrap().clone()),
         k => match args.get(1).unwrap().trim() {

@@ -8,11 +8,11 @@ use diesel::{update, QueryDsl, RunQueryDsl, SqliteConnection};
 use std::process;
 
 pub fn update_mark(args : &mut Vec<String>, conn : &mut SqliteConnection, unmark : bool) {
+    let plan_id = get_plan_arg(args, conn);
     if (args.len() < 2 && !unmark) || (args.len() < 1 && unmark) {
         display_bad_usage();
         process::exit(1);
     }
-    let plan_id = get_plan_arg(args, conn);
     match get_subject(args.get(0).unwrap(), conn, Some(plan_id)) {
         Some(s) => {
             if !unmark {
