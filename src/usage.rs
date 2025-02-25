@@ -1,3 +1,6 @@
+//! Module for printing global usage.
+
+
 fn get_usage_string() -> String {
     format!(
         "USAGE: {} subcommand [options]\n\n\
@@ -15,6 +18,7 @@ fn get_usage_string() -> String {
         ", crate::env::args().collect::<Vec<String>>().first().unwrap())
 }
 
+/// Displays global usage.
 pub fn display_usage() {
     println!("{}", get_usage_string());
 }
