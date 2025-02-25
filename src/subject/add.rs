@@ -11,6 +11,7 @@ use std::process;
 pub fn add(args: &mut Vec<String>, conn: &mut SqliteConnection) {
     if args.len() < 2 {
         display_bad_usage();
+        process::exit(1);
     }
     let new_plan_id = match args.contains(&String::from("--plan")) {
         true => {
