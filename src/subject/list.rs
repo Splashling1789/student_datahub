@@ -32,8 +32,7 @@ pub fn list(args: &mut Vec<String>, conn: &mut SqliteConnection) {
         println!("No subjects from this period");
     } else {
         for s in subjects_from_plan {
-            // TODO: Add dedicated time.
-            println!("{}, dedicated time: {}", s.to_string(), 0);
+            println!("{}, TDT: {}", s.to_string(), s.total_dedicated_time(conn));
         }
     }
 }
