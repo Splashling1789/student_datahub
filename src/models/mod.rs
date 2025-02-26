@@ -1,5 +1,10 @@
+//! Database models and implementations.
+
+#[doc(hidden)]
 mod entry;
+#[doc(hidden)]
 mod period;
+#[doc(hidden)]
 mod subject;
 
 use diesel::{Associations, Queryable, Selectable};
