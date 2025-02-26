@@ -17,8 +17,8 @@ pub fn start_plan(
         process::exit(1);
     }
 
-    if let Some(period) = Period::get_actual_period(conn) {
-        if period.overlaps((new_start, new_end)) {
+    for p in Period::fetch_all_plans(conn) {
+        if p.overlaps((new_start, new_end)) {
             eprintln!("Invalid state: Current study period overlaps the provided period.");
             process::exit(1);
         }
