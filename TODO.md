@@ -10,7 +10,7 @@
 ## Code cleaning
  - [ ] plan module reorganized
  - [ ] subject module reorganized
- - [ ] avoid redundant code repeating
+ - [ ] avoid redundant code repetition
  - [ ] docs
 
 ## Optional code cleaning
