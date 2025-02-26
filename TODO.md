@@ -8,8 +8,8 @@
  - [ ] hours and minutes display for dedicated time
 
 ## Code cleaning
- - [ ] plan module reorganized
- - [ ] subject module reorganized
+ - [x] plan module reorganized
+ - [x] subject module reorganized
  - [ ] avoid redundant code repetition
  - [ ] docs
 
