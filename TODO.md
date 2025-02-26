@@ -5,6 +5,7 @@
  - [x] using home directory for database
  - [ ] csv export
  - [ ] status command
+ - [ ] hours and minutes display for dedicated time
 
 ## Code cleaning
  - [ ] plan module reorganized
