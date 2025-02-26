@@ -8,6 +8,7 @@ use crate::{debug_println, FORMAT};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::prelude::*;
 use std::process;
+use crate::schema::subjects::dsl::subjects;
 
 #[derive(Queryable, Selectable, Clone, Debug)]
 #[diesel(table_name = crate::schema::entry)]
@@ -256,4 +257,17 @@ impl Subject {
                 .sum(),
         }
     }
+    /// Fetches all subjects from the database.
+    /// # Arguments:
+    /// * conn - Database connection.
+    pub fn fetch_all(conn: &mut SqliteConnection) -> Vec<Subject> {
+        match subjects.load::<Subject>(conn) {
+            Ok(result) => result,
+            Err(e) => {
+                eprintln!("Failed to fetch subjects: {}", e);
+                process::exit(1);
+            }
+        }
+    }
+
 }

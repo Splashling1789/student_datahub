@@ -5,7 +5,7 @@ use crate::models::Subject;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{id, short_name};
 use crate::subject::usage::display_bad_usage;
-use crate::subject::{add, fetch_all_subjects, list, mark, modify, remove};
+use crate::subject::{add, list, mark, modify, remove};
 use diesel::QueryDsl;
 use diesel::{ExpressionMethods, RunQueryDsl, SqliteConnection};
 use std::process;
@@ -31,7 +31,7 @@ pub fn get_subject(
                 Ok(s) => {
                     if s.len() > 1 && plan_id.is_some() {
                         debug_println!("There is more than one subject with same short name.");
-                        fetch_all_subjects(conn)
+                        Subject::fetch_all(conn)
                             .iter()
                             .filter(|s| s.period_id == plan_id.unwrap())
                             .collect::<Vec<&Subject>>()

@@ -1,6 +1,5 @@
 use crate::models::{Period, Subject};
 use crate::plan::get_plan_arg;
-use crate::subject::fetch_all_subjects;
 use diesel::SqliteConnection;
 use std::process;
 
@@ -23,7 +22,7 @@ pub fn list(args: &mut Vec<String>, conn: &mut SqliteConnection) {
         plan.initial_date.to_string(),
         plan.final_date.to_string()
     );
-    let subjects_from_plan = fetch_all_subjects(conn)
+    let subjects_from_plan = Subject::fetch_all(conn)
         .iter()
         .filter(|s| s.period_id == plan_id)
         .cloned()

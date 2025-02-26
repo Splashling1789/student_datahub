@@ -7,6 +7,7 @@ use crate::subject::usage::display_bad_usage;
 use diesel::ExpressionMethods;
 use diesel::{update, QueryDsl, RunQueryDsl, SqliteConnection};
 use std::process;
+use crate::models::Subject;
 
 pub fn modify(args: &mut Vec<String>, conn: &mut SqliteConnection) {
     let plan_id = get_plan_arg(args, conn);
@@ -26,7 +27,7 @@ pub fn modify(args: &mut Vec<String>, conn: &mut SqliteConnection) {
         None => subj.short_name.clone(),
     };
     // Two subjects from the same plan can't have the same short name.
-    if super::fetch_all_subjects(conn).iter().any(|s| {
+    if Subject::fetch_all(conn).iter().any(|s| {
         s.id != subj.id && s.period_id == subj.period_id && s.short_name.eq(&new_short_name)
     }) {
         eprintln!("A subject already exists in the period with the same short name.");

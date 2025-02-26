@@ -7,6 +7,7 @@ use diesel::dsl::insert_into;
 use diesel::ExpressionMethods;
 use diesel::{RunQueryDsl, SqliteConnection};
 use std::process;
+use crate::models::Subject;
 
 pub fn add(args: &mut Vec<String>, conn: &mut SqliteConnection) {
     let new_plan_id = get_plan_arg(args, conn);
@@ -22,7 +23,7 @@ pub fn add(args: &mut Vec<String>, conn: &mut SqliteConnection) {
     }
 
     // Two subjects from the same plan can't have the same short name.
-    if super::fetch_all_subjects(conn)
+    if Subject::fetch_all(conn)
         .iter()
         .any(|s| s.period_id == new_plan_id && s.short_name.eq(&new_short_name))
     {
