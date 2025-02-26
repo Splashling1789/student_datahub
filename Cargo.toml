@@ -10,4 +10,3 @@ diesel = {version = "2.2.7", features = ["sqlite", "returning_clauses_for_sqlite
 diesel_migrations = "2.2.0"
 dotenv = "0.15.0"
 colored = "3.0.0"
-libsqlite3-sys = "0.30.1"
