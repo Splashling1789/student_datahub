@@ -3,7 +3,7 @@ use crate::entry::set::set_time;
 use crate::entry::substract::subtract_time;
 use crate::entry::usage::display_bad_usage;
 use crate::models::Period;
-use crate::subject::interpreter::get_subject;
+use crate::subject::get_subject;
 use crate::FORMAT;
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::SqliteConnection;

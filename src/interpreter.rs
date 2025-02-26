@@ -66,7 +66,7 @@ pub fn interpret(args: &mut Vec<String>) {
             match option.trim() {
                 //"status" => status::display_status(),
                 "plan" => plan::interpret(args, &mut conn),
-                "subject" => subject::interpreter::interpret(args, &mut conn),
+                "subject" => subject::interpret(args, &mut conn),
                 "add" => entry::time_setter(&mut conn, args, Mode::ADD),
                 "substract" => entry::time_setter(&mut conn, args, Mode::SUBSTRACT),
                 "set" => entry::time_setter(&mut conn, args, Mode::SET),

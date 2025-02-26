@@ -156,7 +156,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                                     process::exit(1);
                                 }
                             },
-                            Err(e) => {
+                            Err(_) => {
                                 eprintln!("Failed to parse ID. Did you give a number?");
                                 process::exit(1);
                             }
