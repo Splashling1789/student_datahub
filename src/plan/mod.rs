@@ -134,35 +134,33 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                 }
             }
             "remove" => {
-                if args.len() > 2{
+                if args.len() > 2 {
                     display_bad_usage();
                     process::exit(1);
                 }
-                
+
                 let period = match args.get(0) {
-                    Some(s) => {
-                        match s.trim() {
-                            "--confirm" => match Period::get_actual_period(conn) {
+                    Some(s) => match s.trim() {
+                        "--confirm" => match Period::get_actual_period(conn) {
+                            Some(p) => p,
+                            None => {
+                                eprintln!("There is no actual period.");
+                                process::exit(1);
+                            }
+                        },
+                        k => match k.parse::<i32>() {
+                            Ok(i) => match Period::from_id(conn, i) {
                                 Some(p) => p,
                                 None => {
-                                    eprintln!("There is no actual period.");
+                                    eprintln!("Period with id {i} not found");
                                     process::exit(1);
                                 }
                             },
-                            k => match k.parse::<i32>() {
-                                Ok(i) => match Period::from_id(conn, i) {
-                                    Some(p) => p,
-                                    None => {
-                                        eprintln!("Period with id {i} not found");
-                                        process::exit(1);
-                                    }
-                                },
-                                Err(e) => {
-                                    eprintln!("Failed to parse ID. Did you give a number?");
-                                    process::exit(1);
-                                }
+                            Err(e) => {
+                                eprintln!("Failed to parse ID. Did you give a number?");
+                                process::exit(1);
                             }
-                        }
+                        },
                     },
                     None => match Period::get_actual_period(conn) {
                         Some(p) => p,
@@ -170,14 +168,13 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                             eprintln!("There is no actual period.");
                             process::exit(1);
                         }
-                    }
+                    },
                 };
                 if !args.contains(&"--confirm".to_string()) {
                     println!("{}", period.to_string());
                     request_confirmation("Are you sure you want to remove the study plan? [Y/N]");
                 }
                 remove::remove_plan(conn, period.id);
-                
             } // remove command ends here
             "modify" => {
                 let plan_id: i32 = get_plan_arg(args, conn);
