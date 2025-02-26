@@ -2,6 +2,8 @@
 name = "student_datahub"
 version = "0.1.0"
 edition = "2021"
+authors = ["Javier Albero <splashling1789@gmail.com>"]
+description = "A command-line that lets you register your study time for later data-analysis"
 
 [dependencies]
 diesel = {version = "2.2.7", features = ["sqlite", "returning_clauses_for_sqlite_3_35", "chrono"]}
