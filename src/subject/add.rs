@@ -1,6 +1,5 @@
 use crate::debug_println;
-use crate::models::Period;
-use crate::plan::interpreter::get_plan_arg;
+use crate::plan::get_plan_arg;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{name, period_id, short_name};
 use crate::subject::usage::display_bad_usage;

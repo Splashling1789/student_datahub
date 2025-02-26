@@ -1,5 +1,5 @@
 use crate::models::{Period, Subject};
-use crate::plan::interpreter::get_plan_arg;
+use crate::plan::get_plan_arg;
 use crate::subject::fetch_all_subjects;
 use diesel::SqliteConnection;
 use std::process;

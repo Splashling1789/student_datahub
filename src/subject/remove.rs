@@ -1,5 +1,5 @@
 use crate::interpreter::request_confirmation;
-use crate::plan::interpreter::get_plan_arg;
+use crate::plan::get_plan_arg;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::id;
 use crate::subject::interpreter::get_subject;

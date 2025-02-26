@@ -1,4 +1,4 @@
-use crate::plan::interpreter::get_plan_arg;
+use crate::plan::get_plan_arg;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{final_score, id};
 use crate::subject::interpreter::get_subject;
