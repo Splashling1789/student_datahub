@@ -33,12 +33,12 @@ impl Entry {
             .expect("Error loading period")
             .pop()
     }
-    
+
     /// Fetches a vector with all entries from a single date.
     /// # Arguments
     /// * `date_to_fetch` - Date from which we want the entries
     /// * `conn` - Database connection
-    pub fn fetch_by_day(date_to_fetch : NaiveDate, conn : &mut SqliteConnection) -> Vec<Entry> {
+    pub fn fetch_by_day(date_to_fetch: NaiveDate, conn: &mut SqliteConnection) -> Vec<Entry> {
         entry
             .filter(date.eq(&date_to_fetch))
             .load::<Entry>(conn)
@@ -50,14 +50,20 @@ impl Entry {
     /// * `date_to_fetch` - date to search.
     /// * `subject_to_fetch` - subject id to search.
     /// * `conn` - connection to the database.
-    pub fn get_time_by_day_and_subject(date_to_fetch : NaiveDate, subject_to_fetch : i32, conn : &mut SqliteConnection) -> i32 {
+    pub fn get_time_by_day_and_subject(
+        date_to_fetch: NaiveDate,
+        subject_to_fetch: i32,
+        conn: &mut SqliteConnection,
+    ) -> i32 {
         match entry
             .filter(date.eq(&date_to_fetch))
             .filter(subject_id.eq(&subject_to_fetch))
             .load::<Entry>(conn)
-            .expect("Failed to fetch entries").first() {
+            .expect("Failed to fetch entries")
+            .first()
+        {
             Some(e) => e.dedicated_time,
-            None => 0
+            None => 0,
         }
     }
 }
@@ -111,17 +117,18 @@ impl Period {
     /// # Arguments
     /// * `conn` - Database connection.
     /// * `period_date` - Date of the period.
-    pub fn from_date(conn : &mut SqliteConnection, period_date : &NaiveDate) -> Option<Period> {
+    pub fn from_date(conn: &mut SqliteConnection, period_date: &NaiveDate) -> Option<Period> {
         match periods
             .filter(initial_date.le(period_date))
             .filter(final_date.ge(period_date))
-            .load::<Period>(conn) {
+            .load::<Period>(conn)
+        {
             Ok(period) => {
                 if period.len() > 1 {
                     debug_println!(
-                    "There is more than one period ocurring now! Content: {:?}",
-                    period
-                );
+                        "There is more than one period ocurring now! Content: {:?}",
+                        period
+                    );
                 }
                 period.first().cloned()
             }
@@ -131,16 +138,17 @@ impl Period {
             }
         }
     }
-    
+
     /// Gets the period given its id. Returns None if there isn't any.
     /// # Arguments
     /// * `conn` - Database connection
     /// * `id_to_fetch` - Period id.
     pub fn from_id(conn: &mut SqliteConnection, id_to_fetch: i32) -> Option<Period> {
-        match periods.filter(crate::schema::periods::id.eq(id_to_fetch)).load::<Period>(conn) {
-            Ok(p) => {
-                p.first().cloned()
-            }
+        match periods
+            .filter(crate::schema::periods::id.eq(id_to_fetch))
+            .load::<Period>(conn)
+        {
+            Ok(p) => p.first().cloned(),
             Err(e) => {
                 eprintln!("Failed to fetch period: {e}");
                 process::exit(1);
@@ -154,7 +162,7 @@ impl Period {
     pub fn get_actual_period(conn: &mut SqliteConnection) -> Option<Period> {
         Self::from_date(conn, &Local::now().date_naive())
     }
-    
+
     /// It determines whether the period is overlaping another.
     pub fn overlaps_period(&self, other: &Period) -> bool {
         let p2 = (other.initial_date, other.final_date);
@@ -188,16 +196,20 @@ impl Subject {
     /// Gets a formatted string with relevant data of the subject.
     pub fn to_string(&self) -> String {
         if self.final_score.is_some() {
-            format!("{} ({}) [{}]", self.name, self.short_name, self.final_score.unwrap())
-        }
-        else {
+            format!(
+                "{} ({}) [{}]",
+                self.name,
+                self.short_name,
+                self.final_score.unwrap()
+            )
+        } else {
             format!("{} ({})", self.name, self.short_name)
         }
     }
     /// Gets the total dedicated time of the subject
     /// # Arguments
     /// * `conn` - Database connection
-    pub fn total_dedicated_time(&self, conn : &mut SqliteConnection) -> i32 {
+    pub fn total_dedicated_time(&self, conn: &mut SqliteConnection) -> i32 {
         entry
             .filter(subject_id.eq(self.id))
             .load::<Entry>(conn)
@@ -210,10 +222,14 @@ impl Subject {
     /// # Arguments
     /// * `conn` - Database connection
     /// * `interval` - Interval, where [None] means infinite
-    pub fn total_dedicated_time_interval(&self, conn : &mut SqliteConnection, interval : (Option<NaiveDate>, Option<NaiveDate>)) -> i32 {
+    pub fn total_dedicated_time_interval(
+        &self,
+        conn: &mut SqliteConnection,
+        interval: (Option<NaiveDate>, Option<NaiveDate>),
+    ) -> i32 {
         match interval {
             (None, None) => self.total_dedicated_time(conn),
-            (Some(k), None) =>         entry
+            (Some(k), None) => entry
                 .filter(subject_id.eq(self.id))
                 .filter(date.ge(k))
                 .load::<Entry>(conn)

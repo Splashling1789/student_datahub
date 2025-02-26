@@ -8,10 +8,10 @@ use std::process;
 mod add;
 pub mod interpreter;
 mod list;
-mod modify;
-mod usage;
-mod remove;
 mod mark;
+mod modify;
+mod remove;
+mod usage;
 
 /// Fetches all subjects from the database.
 /// # Arguments:

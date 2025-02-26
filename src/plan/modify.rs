@@ -14,14 +14,14 @@ use std::process;
 
 pub fn modify(conn: &mut SqliteConnection, args: &mut Vec<String>) {
     let plan_id: i32 = get_plan_arg(args, conn);
-    
+
     let plan = match Period::from_id(conn, plan_id) {
-            Some(period) => period,
-            None => {
-                eprintln!("Failed to fetch period. Does this id exist?");
-                process::exit(1);
-            }
-        };
+        Some(period) => period,
+        None => {
+            eprintln!("Failed to fetch period. Does this id exist?");
+            process::exit(1);
+        }
+    };
     let new_start_date: NaiveDate = match args.contains(&"--start".to_string()) {
         true => get_date_arg(args, "--start"),
         false => plan.initial_date,

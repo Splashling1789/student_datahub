@@ -7,7 +7,7 @@ use diesel::ExpressionMethods;
 use diesel::{update, QueryDsl, RunQueryDsl, SqliteConnection};
 use std::process;
 
-pub fn update_mark(args : &mut Vec<String>, conn : &mut SqliteConnection, unmark : bool) {
+pub fn update_mark(args: &mut Vec<String>, conn: &mut SqliteConnection, unmark: bool) {
     let plan_id = get_plan_arg(args, conn);
     if (args.len() < 2 && !unmark) || (args.len() < 1 && unmark) {
         display_bad_usage();
@@ -23,28 +23,32 @@ pub fn update_mark(args : &mut Vec<String>, conn : &mut SqliteConnection, unmark
                         process::exit(1);
                     }
                 };
-                match update(subjects.filter(id.eq(s.id))).set(final_score.eq(mark)).execute(conn) {
+                match update(subjects.filter(id.eq(s.id)))
+                    .set(final_score.eq(mark))
+                    .execute(conn)
+                {
                     Ok(_) => {
                         println!("Successfully marked {} with score {}", s.short_name, mark);
-                    },
+                    }
                     Err(e) => {
                         eprintln!("Failed marking: {e}");
                         process::exit(1);
                     }
                 }
-            }
-            else {
-                match update(subjects.filter(id.eq(s.id))).set(final_score.eq::<Option<f32>>(None)).execute(conn) {
+            } else {
+                match update(subjects.filter(id.eq(s.id)))
+                    .set(final_score.eq::<Option<f32>>(None))
+                    .execute(conn)
+                {
                     Ok(_) => {
                         println!("Successfully unmarked {}", s.short_name);
-                    },
+                    }
                     Err(e) => {
                         eprintln!("Failed marking: {e}");
                         process::exit(1);
                     }
                 }
             }
-
         }
         None => {
             println!("No such subject");

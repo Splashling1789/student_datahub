@@ -1,6 +1,5 @@
 //! Module for printing global usage.
 
-
 fn get_usage_string() -> String {
     format!(
         "USAGE: {} subcommand [options]\n\n\

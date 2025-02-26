@@ -1,38 +1,38 @@
-use std::process;
-use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
-use diesel::SqliteConnection;
 use crate::entry::add::add_time;
 use crate::entry::set::set_time;
 use crate::entry::substract::subtract_time;
 use crate::entry::usage::display_bad_usage;
-use crate::FORMAT;
-use crate::models::{Period};
+use crate::models::Period;
 use crate::subject::interpreter::get_subject;
+use crate::FORMAT;
+use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
+use diesel::SqliteConnection;
+use std::process;
 
 mod add;
-mod usage;
-mod substract;
 mod set;
+mod substract;
+mod usage;
 
 pub enum Mode {
     ADD,
     SUBSTRACT,
-    SET
+    SET,
 }
 
-pub fn time_setter(conn : &mut SqliteConnection, args:  &mut Vec<String>, mode : Mode) {
+pub fn time_setter(conn: &mut SqliteConnection, args: &mut Vec<String>, mode: Mode) {
     let when: NaiveDate = match args.len() {
         3 => match NaiveDate::parse_from_str(&*args.get(0).unwrap().clone(), FORMAT) {
             Ok(when) => {
                 args.remove(0);
                 when
-            },
+            }
             Err(_) => {
                 eprintln!("Error parsing date. Remember using format {FORMAT}");
                 process::exit(1);
-            },
+            }
         },
-        _ => Local::now().naive_local().date()
+        _ => Local::now().naive_local().date(),
     };
     if args.len() < 2 {
         display_bad_usage();
@@ -57,17 +57,16 @@ pub fn time_setter(conn : &mut SqliteConnection, args:  &mut Vec<String>, mode :
             if amount <= 0 {
                 eprintln!("The amount of time must be a positive integer");
                 process::exit(1);
-            }
-            else {
+            } else {
                 amount
             }
-        },
+        }
         Err(_) => {
             eprintln!("The amount of time must be a positive integer");
             process::exit(1);
         }
     };
-    
+
     match mode {
         Mode::ADD => {
             add_time(conn, subject, when, amount);

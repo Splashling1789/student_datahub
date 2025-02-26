@@ -3,28 +3,34 @@
 //! the work to command submodules ([plan], [subject], [export]). It also provides
 //! useful functions to every command submodule.
 
+use crate::entry::Mode;
 use crate::{debug_println, entry, plan, subject, usage};
 use diesel::{Connection, SqliteConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use std::path::Path;
 use std::{env, fs, process};
-use crate::entry::Mode;
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
 pub fn get_data_dir() -> String {
     #[cfg(target_os = "windows")]
-    let home = format!("{}\\.student_datahub\\", env::var("APPDATA").expect("Failed to get HOME environment variable"));
-    
+    let home = format!(
+        "{}\\.student_datahub\\",
+        env::var("APPDATA").expect("Failed to get HOME environment variable")
+    );
+
     #[cfg(not(target_os = "windows"))]
-    let home = format!("{}/.student_datahub/", env::var("HOME").expect("Failed to get HOME environment variable"));
+    let home = format!(
+        "{}/.student_datahub/",
+        env::var("HOME").expect("Failed to get HOME environment variable")
+    );
 
     // We create the path if it doesn't exist.
     let path = Path::new(&home);
     if !path.exists() {
         fs::create_dir_all(path).expect("No se pudo crear la carpeta");
     }
-    
+
     home
 }
 
@@ -42,7 +48,11 @@ pub fn interpret(args: &mut Vec<String>) {
             args.remove(0);
             debug_println!("using arg: {option}");
             dotenv::dotenv().ok();
-            let connection_string = format!("{}{}", get_data_dir(), env::var("DATABASE_URL").expect("Failed to get DATABASE_URL from .env file"));
+            let connection_string = format!(
+                "{}{}",
+                get_data_dir(),
+                env::var("DATABASE_URL").expect("Failed to get DATABASE_URL from .env file")
+            );
             debug_println!("connecting to {connection_string}");
             let mut conn = SqliteConnection::establish(&connection_string).unwrap();
 
@@ -81,7 +91,7 @@ pub fn get_specific_arg(args: &mut Vec<String>, find: &str) -> Option<String> {
 /// with code 0.
 /// # Arguments
 /// * `warn` - Warn to print before stdin wait.
-pub fn request_confirmation(warn : &str) {
+pub fn request_confirmation(warn: &str) {
     println!("{warn}");
     let mut response = String::new();
     std::io::stdin().read_line(&mut response).expect(

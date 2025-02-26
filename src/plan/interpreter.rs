@@ -8,7 +8,7 @@ use diesel::internal::derives::multiconnection::chrono::NaiveDate;
 use diesel::SqliteConnection;
 use std::process;
 
-pub fn get_plan_arg(args: &mut Vec<String>, conn : &mut SqliteConnection) -> i32 {
+pub fn get_plan_arg(args: &mut Vec<String>, conn: &mut SqliteConnection) -> i32 {
     match get_specific_arg(args, "--plan") {
         Some(plan_id) => match plan_id.parse::<i32>() {
             Ok(r) => {
@@ -22,27 +22,24 @@ pub fn get_plan_arg(args: &mut Vec<String>, conn : &mut SqliteConnection) -> i32
                 if let Some(index) = index {
                     args.remove(index);
                     args.remove(index);
-                }
-                else {
+                } else {
                     debug_println!("get_plan_arg: no index to remove was found.");
                 }
                 r
-            },
+            }
             Err(e) => {
                 eprintln!("Failed to parse id.");
                 debug_println!("{e}");
                 process::exit(1);
             }
         },
-        None => {
-            match Period::get_actual_period(conn) {
-                Some(r) => r.id,
-                None => {
-                    eprintln!("No period specified/ocurring now");
-                    process::exit(1);
-                }
+        None => match Period::get_actual_period(conn) {
+            Some(r) => r.id,
+            None => {
+                eprintln!("No period specified/ocurring now");
+                process::exit(1);
             }
-        }
+        },
     }
 }
 

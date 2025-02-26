@@ -1,3 +1,4 @@
+use crate::interpreter::request_confirmation;
 use crate::plan::interpreter::get_plan_arg;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::id;
@@ -7,15 +8,14 @@ use diesel::ExpressionMethods;
 use diesel::QueryDsl;
 use diesel::{delete, RunQueryDsl, SqliteConnection};
 use std::process;
-use crate::interpreter::request_confirmation;
 
-pub fn remove(args : &mut Vec<String>, conn : &mut SqliteConnection) {
+pub fn remove(args: &mut Vec<String>, conn: &mut SqliteConnection) {
     let plan_id = get_plan_arg(args, conn);
     if args.len() < 1 {
         display_bad_usage();
         process::exit(1);
     }
-    
+
     match get_subject(args.get(0).unwrap(), conn, Some(plan_id)) {
         Some(subj) => {
             if !args.contains(&"--confirm".to_string()) {
@@ -37,5 +37,4 @@ pub fn remove(args : &mut Vec<String>, conn : &mut SqliteConnection) {
             process::exit(1);
         }
     }
-
 }

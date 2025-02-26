@@ -7,11 +7,23 @@ use diesel::{update, ExpressionMethods, QueryDsl};
 use diesel::{RunQueryDsl, SqliteConnection};
 use std::process;
 
-pub fn add_time(conn : &mut SqliteConnection, subject: Subject, when:NaiveDate, amount_to_add: i32) {
+pub fn add_time(
+    conn: &mut SqliteConnection,
+    subject: Subject,
+    when: NaiveDate,
+    amount_to_add: i32,
+) {
     let amount = Entry::get_time_by_day_and_subject(when, subject.id, conn) + amount_to_add;
     // If there was no previous entries, it creates one.
     if amount == amount_to_add {
-        match insert_into(entry).values((date.eq(when), subject_id.eq(subject.id), dedicated_time.eq(0))).execute(conn) {
+        match insert_into(entry)
+            .values((
+                date.eq(when),
+                subject_id.eq(subject.id),
+                dedicated_time.eq(0),
+            ))
+            .execute(conn)
+        {
             Ok(_) => {}
             Err(e) => {
                 eprintln!("Failed to insert entry: {e}");
@@ -19,8 +31,11 @@ pub fn add_time(conn : &mut SqliteConnection, subject: Subject, when:NaiveDate, 
             }
         }
     }
-    
-    match update(entry.filter(date.eq(when)).filter(date.eq(when))).set(dedicated_time.eq(amount)).execute(conn) {
+
+    match update(entry.filter(date.eq(when)).filter(date.eq(when)))
+        .set(dedicated_time.eq(amount))
+        .execute(conn)
+    {
         Ok(_) => {
             println!("Entry added successfully. Current amount: {amount}");
         }

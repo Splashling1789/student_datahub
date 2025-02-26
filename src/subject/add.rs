@@ -1,3 +1,4 @@
+use crate::debug_println;
 use crate::models::Period;
 use crate::plan::interpreter::get_plan_arg;
 use crate::schema::subjects::dsl::subjects;
@@ -7,7 +8,6 @@ use diesel::dsl::insert_into;
 use diesel::ExpressionMethods;
 use diesel::{RunQueryDsl, SqliteConnection};
 use std::process;
-use crate::debug_println;
 
 pub fn add(args: &mut Vec<String>, conn: &mut SqliteConnection) {
     let new_plan_id = get_plan_arg(args, conn);
@@ -16,7 +16,7 @@ pub fn add(args: &mut Vec<String>, conn: &mut SqliteConnection) {
         process::exit(1);
     }
     debug_println!("{:?}", args);
-    let (new_short_name, new_name) =  (args.get(0).unwrap().clone(), args.get(1).unwrap().clone());
+    let (new_short_name, new_name) = (args.get(0).unwrap().clone(), args.get(1).unwrap().clone());
     if new_short_name.parse::<i32>().is_ok() {
         eprintln!("Short name can't be a number");
         process::exit(1);
