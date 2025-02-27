@@ -4,9 +4,11 @@ use std::process;
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::{RunQueryDsl, SqliteConnection};
 use crate::{debug_println, FORMAT};
-use crate::models::Period;
+use crate::models::{Period, Subject};
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
+use crate::schema::subjects::dsl::subjects;
+use crate::schema::subjects::period_id;
 
 impl Period {
     /// Gets a formatted string with relevant data of the period.
@@ -105,5 +107,20 @@ impl Period {
         (p1.0 <= dates.1 && p1.0 >= dates.0)
             || (p1.1 <= dates.1 && p1.1 >= dates.0)
             || (p1.0 <= dates.0 && p1.1 >= dates.0)
+    }
+    
+    /// Fetches the subjects that belongs to this period.
+    /// #Arguments
+    /// * `conn` - Database connection
+    pub fn fetch_subjects(&self, conn: &mut SqliteConnection) -> Vec<Subject> {
+        match subjects
+            .filter(period_id.eq(self.id))
+            .load::<Subject>(conn) {
+            Ok(v) => v,
+            Err(e) => {
+                eprintln!("Failed to fetch the subjects.");
+                process::exit(1);
+            }
+        }
     }
 }
