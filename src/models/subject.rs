@@ -72,9 +72,25 @@ impl Subject {
                 .sum(),
         }
     }
+    
+    /// Fetches all entries related to the subject.
+    /// # Arguments
+    /// * `conn` - Database connection
+    pub fn fetch_entries(&self, conn: &mut SqliteConnection) -> Vec<Entry> {
+        match entry
+            .filter(subject_id.eq(self.id))
+            .load::<Entry>(conn) {
+            Ok(v) => v,
+            Err(e) => {
+                eprintln!("Failed to fetch entry: {}", e);
+                process::exit(1);
+            }
+        }
+    }
+    
     /// Fetches all subjects from the database.
     /// # Arguments:
-    /// * conn - Database connection.
+    /// * `conn` - Database connection.
     pub fn fetch_all(conn: &mut SqliteConnection) -> Vec<Subject> {
         match subjects.load::<Subject>(conn) {
             Ok(result) => result,
