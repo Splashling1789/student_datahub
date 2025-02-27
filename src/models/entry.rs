@@ -31,6 +31,39 @@ impl Entry {
             .load::<Entry>(conn)
             .expect("Error loading entry")
     }
+    
+    /// Fetches a vector with all entries in a given date interval.
+    /// # Arguments
+    /// * `conn`- Database connection
+    /// * `interval` - Date interval (start, end)
+    pub fn fetch_by_interval(conn : &mut SqliteConnection, interval: (Option<NaiveDate>, Option<NaiveDate>)) -> Vec<Entry> {
+        match interval {
+            (Some(s), Some(e)) => {
+                entry
+                    .filter(date.ge(&s))
+                    .filter(date.le(&e))
+                    .load::<Entry>(conn)
+                    .expect("Error loading entry")
+            }
+            (Some(s), None) => {
+                entry
+                    .filter(date.ge(&s))
+                    .load::<Entry>(conn)
+                    .expect("Error loading entry")
+            }
+            (None, Some(e)) => {
+                entry
+                    .filter(date.le(&e))
+                    .load::<Entry>(conn)
+                    .expect("Error loading entry")
+            }
+            (None, None) => {
+                entry
+                    .load::<Entry>(conn)
+                    .expect("Error loading entry")
+            }
+        }
+    }
 
     /// Gets the dedicated time to a subject in a determined day. If there was no entry regarding that date, returns zero.
     /// # Arguments
