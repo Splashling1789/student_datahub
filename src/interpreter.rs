@@ -10,6 +10,7 @@ use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use std::path::Path;
 use std::{env, fs, process};
 
+/// Diesel migrations constant
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
 pub fn get_data_dir() -> String {
