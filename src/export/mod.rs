@@ -6,6 +6,7 @@ use crate::models::Period;
 use crate::plan::{get_date_arg, get_plan_arg};
 
 mod usage;
+mod csv;
 
 pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
     let plan_id = get_plan_arg(args, conn);
