@@ -28,19 +28,19 @@ fn get_file_path(path: &str, mode : &ExportMode, descr : String) -> PathBuf {
             #[cfg(not(target_os = "windows"))]
             return PathBuf::from(format!("{path}daily_{}_{}.csv", descr, Local::now().naive_local().format(DATETIME_EXPORT_FORMAT).to_string()));
             #[cfg(target_os = "windows")]
-            return PathBuf::from(format!("{path}\\daily_{}_{}.csv", descr, Local::now().naive_local().format(DATETIME_EXPORT_FORMAT).to_string()));
+            return PathBuf::from(format!("{path}daily_{}_{}.csv", descr, Local::now().naive_local().format(DATETIME_EXPORT_FORMAT).to_string()));
         },
         ExportMode::WEEKLY => {
             #[cfg(not(target_os = "windows"))]
             return PathBuf::from(format!("{path}weekly_{}_{}.csv", descr, Local::now().naive_local().format(DATETIME_EXPORT_FORMAT).to_string()));
             #[cfg(target_os = "windows")]
-            return PathBuf::from(format!("{path}\\weekly{}_{}.csv", descr, Local::now().naive_local().format(DATETIME_EXPORT_FORMAT).to_string()));
+            return PathBuf::from(format!("{path}weekly{}_{}.csv", descr, Local::now().naive_local().format(DATETIME_EXPORT_FORMAT).to_string()));
         },
         ExportMode::MONTHLY => {
             #[cfg(not(target_os = "windows"))]
             return PathBuf::from(format!("{path}monthly_{}_{}.csv", descr, Local::now().naive_local().format(DATETIME_EXPORT_FORMAT).to_string()));
             #[cfg(target_os = "windows")]
-            return PathBuf::from(format!("{path}\\monthly{}_{}.csv", descr, Local::now().naive_local().format(DATETIME_EXPORT_FORMAT).to_string()));
+            return PathBuf::from(format!("{path}monthly{}_{}.csv", descr, Local::now().naive_local().format(DATETIME_EXPORT_FORMAT).to_string()));
         }
     }
 }
