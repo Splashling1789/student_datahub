@@ -40,7 +40,6 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
     let mut header = vec![String::from("date")];
     let subjects = period.fetch_subjects(conn);
     for i in &subjects {
-        //TODO: Add comma restriction to subjects short name
         let column = i.short_name.clone();
         header.push(column);
     }
