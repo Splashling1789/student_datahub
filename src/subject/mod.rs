@@ -84,6 +84,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                 add::add(conn, plan_id, new_short_name, new_name);
             }
             "modify" => {
+                // TODO: Detect whether an uknown argument has been inputed. In that case, the program should display bad usage.
                 if args.len() < 1 {
                     display_bad_usage();
                     process::exit(1);
