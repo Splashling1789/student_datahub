@@ -4,7 +4,7 @@
 //! useful functions to every command submodule.
 
 use crate::entry::Mode;
-use crate::{debug_println, entry, plan, subject, usage};
+use crate::{debug_println, entry, export, plan, subject, usage};
 use diesel::{Connection, SqliteConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use std::path::Path;
@@ -71,6 +71,7 @@ pub fn interpret(args: &mut Vec<String>) {
                 "add" => entry::time_setter(&mut conn, args, Mode::ADD),
                 "substract" => entry::time_setter(&mut conn, args, Mode::SUBSTRACT),
                 "set" => entry::time_setter(&mut conn, args, Mode::SET),
+                "export" => export::interpret(args, &mut conn),
                 _ => {}
             }
         }

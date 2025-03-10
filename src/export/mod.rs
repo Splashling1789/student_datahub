@@ -1,12 +1,20 @@
 use std::ops::Add;
 use std::process;
 use diesel::SqliteConnection;
+use crate::export::csv::csv_export;
 use crate::export::usage::display_bad_usage;
+use crate::interpreter::get_data_dir;
 use crate::models::Period;
 use crate::plan::{get_date_arg, get_plan_arg};
 
 mod usage;
 mod csv;
+
+enum ExportMode{
+    DAILY,
+    WEEKLY,
+    MONTHLY
+}
 
 pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
     let plan_id = get_plan_arg(args, conn);
@@ -38,7 +46,7 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
     }
     match args.get(0).unwrap().trim() {
         "daily" => {
-            
+            csv_export(conn, period, (start_date, end_date), &*get_data_dir(), ExportMode::DAILY)
         },
         "weekly" => {
             
