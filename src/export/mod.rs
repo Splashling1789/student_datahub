@@ -49,7 +49,7 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
             csv_export(conn, period, (start_date, end_date), &*get_data_dir(), ExportMode::DAILY)
         },
         "weekly" => {
-            
+            csv_export(conn, period, (start_date, end_date), &*get_data_dir(), ExportMode::WEEKLY)
         },
         "monthly" => {
             

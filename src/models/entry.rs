@@ -1,9 +1,10 @@
-use diesel::QueryDsl;
+use diesel::{IntoSql, QueryDsl};
 use diesel::ExpressionMethods;
 use diesel::{RunQueryDsl, SqliteConnection};
+use diesel::dsl::sum;
 use diesel::internal::derives::multiconnection::chrono::NaiveDate;
 use crate::models::{Entry, Period};
-use crate::schema::entry::{date, subject_id};
+use crate::schema::entry::{date, dedicated_time, subject_id};
 use crate::schema::entry::dsl::entry;
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
@@ -84,6 +85,48 @@ impl Entry {
         {
             Some(e) => e.dedicated_time,
             None => 0,
+        }
+    }
+
+    pub fn get_time_by_interval_and_subject(conn: &mut SqliteConnection, interval: (Option<NaiveDate>, Option<NaiveDate>), subject_to_fetch: i32) -> i32 {
+        match interval {
+            (Some(s), Some(e)) => {
+                entry
+                    .select(sum(dedicated_time))
+                    .filter(subject_id.eq(&subject_to_fetch))
+                    .filter(date.ge(&s))
+                    .filter(date.le(&e))
+                    .first::<Option<i64>>(conn)
+                    .expect("Error loading entry")
+                    .unwrap_or(0) as i32
+                
+            }
+            (Some(s), None) => {
+                entry
+                    .select(sum(dedicated_time))
+                    .filter(subject_id.eq(&subject_to_fetch))
+                    .filter(date.ge(&s))
+                    .first::<Option<i64>>(conn)
+                    .expect("Error loading entry")
+                    .unwrap_or(0) as i32
+            }
+            (None, Some(e)) => {
+                entry
+                    .select(sum(dedicated_time))
+                    .filter(subject_id.eq(&subject_to_fetch))
+                    .filter(date.le(&e))
+                    .first::<Option<i64>>(conn)
+                    .expect("Error loading entry")
+                    .unwrap_or(0) as i32
+            }
+            (None, None) => {
+                entry
+            .select(sum(dedicated_time))
+                    .filter(subject_id.eq(&subject_to_fetch))
+            .first::<Option<i64>>(conn)
+            .expect("Error loading entry")
+            .unwrap_or(0) as i32
+            }
         }
     }
 }
