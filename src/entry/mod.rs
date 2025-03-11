@@ -1,3 +1,5 @@
+//! # Functionality of add, substract and set commands.
+//! This module handles the main data operations for study time registers.
 use crate::entry::add::add_time;
 use crate::entry::set::set_time;
 use crate::entry::substract::subtract_time;
@@ -14,12 +16,21 @@ mod set;
 mod substract;
 mod usage;
 
+/// Mode of entry adding
+/// * `ADD` - To add time.
+/// * `SUBSTRACT` - To substract time.
+/// * `SET` - To set time, overriding any previous entry.
 pub enum EntryMode {
     ADD,
     SUBSTRACT,
     SET,
 }
 
+/// Alters or adds an entry of study time.
+/// # Arguments
+/// * `conn` - Database connection
+/// * `args` - Remaining program arguments
+/// * `mode` - Entry altering mode.
 pub fn time_setter(conn: &mut SqliteConnection, args: &mut Vec<String>, mode: EntryMode) {
     let when: NaiveDate = match args.len() {
         3 => match NaiveDate::parse_from_str(&*args.get(0).unwrap().clone(), FORMAT) {

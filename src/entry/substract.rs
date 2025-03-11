@@ -1,3 +1,4 @@
+//! Substract time command
 use crate::models::{Entry, Subject};
 use crate::schema::entry::dsl::entry;
 use crate::schema::entry::{date, dedicated_time, subject_id};
@@ -7,20 +8,19 @@ use diesel::SqliteConnection;
 use diesel::{update, ExpressionMethods, QueryDsl, RunQueryDsl};
 use std::process;
 
-fn max(a: i32, b: i32) -> i32 {
-    match a < b {
-        true => b,
-        false => a,
-    }
-}
-
+/// Substracts study time to a subject in a specific date
+/// # Arguments
+/// * `conn` - Database connection
+/// * `subject` - Subject studied.
+/// * `when` - Date when studied.
+/// * `amount_to_substract` - Amount to substract to the current time.
 pub fn subtract_time(
     conn: &mut SqliteConnection,
     subject: Subject,
     when: NaiveDate,
     amount_to_substract: i32,
 ) {
-    let amount = max(
+    let amount = std::cmp::max(
         Entry::get_time_by_day_and_subject(when, subject.id, conn) - amount_to_substract,
         0,
     );

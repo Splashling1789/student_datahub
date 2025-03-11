@@ -1,3 +1,4 @@
+//! Add time command
 use crate::models::{Entry, Subject};
 use crate::schema::entry::dsl::entry;
 use crate::schema::entry::{date, dedicated_time, subject_id};
@@ -7,6 +8,12 @@ use diesel::{update, ExpressionMethods, QueryDsl};
 use diesel::{RunQueryDsl, SqliteConnection};
 use std::process;
 
+/// Adds study time to a subject in a specific date
+/// # Arguments
+/// * `conn` - Database connection
+/// * `subject` - Subject studied.
+/// * `when` - Date when studied.
+/// * `amount_to_add` - Amount to add to the current time.
 pub fn add_time(
     conn: &mut SqliteConnection,
     subject: Subject,

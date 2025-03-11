@@ -1,3 +1,4 @@
+//! Set time command
 use crate::models::Subject;
 use crate::schema::entry::dsl::entry;
 use crate::schema::entry::{date, dedicated_time, subject_id};
@@ -8,6 +9,12 @@ use diesel::{insert_into, update, SqliteConnection};
 use diesel::{ExpressionMethods, RunQueryDsl};
 use std::process;
 
+/// Sets study time to a subject in a specific date
+/// # Arguments
+/// * `conn` - Database connection
+/// * `subject` - Subject studied.
+/// * `when` - Date when studied.
+/// * `amount` - Amount to set.
 pub fn set_time(conn: &mut SqliteConnection, subject: Subject, when: NaiveDate, amount: i32) {
     if amount == 0 {
         match delete(
