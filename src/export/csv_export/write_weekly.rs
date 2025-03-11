@@ -6,7 +6,12 @@ use diesel::SqliteConnection;
 use crate::FORMAT;
 use crate::models::{Entry, Period};
 use super::{get_csv_writer, get_header, WEEKDAY_START};
-
+/// Writes the period study time data by weeks.
+/// # Arguments
+/// * `conn` - Database connection.
+/// * `file` - File path to write.
+/// * `period` - Study period.
+/// * `date_interval` - Date interval to search entries. 
 pub(super) fn write_weekly(conn : &mut SqliteConnection, file : &PathBuf, period: &Period, date_interval : (&NaiveDate, &NaiveDate)) {
     let subjects = period.fetch_subjects(conn);
     let mut writer = get_csv_writer(file);
