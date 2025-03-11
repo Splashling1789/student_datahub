@@ -3,7 +3,7 @@
  - [x] subject subcommand
  - [x] entries add, substract and set
  - [x] using home directory for database
- - [ ] csv export
+ - [x] csv export
  - [ ] status command
  - [ ] hours and minutes display for dedicated time
 
