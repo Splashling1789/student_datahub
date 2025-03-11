@@ -65,15 +65,15 @@ pub fn time_setter(conn: &mut SqliteConnection, args: &mut Vec<String>, mode: En
     };
     let amount = match args.get(1).unwrap().parse::<i32>() {
         Ok(amount) => {
-            if amount <= 0 {
-                eprintln!("The amount of time must be a positive integer");
+            if amount < 0 {
+                eprintln!("The amount of time can't be negative");
                 process::exit(1);
             } else {
                 amount
             }
         }
         Err(_) => {
-            eprintln!("The amount of time must be a positive integer");
+            eprintln!("The amount of time must be a positive or zero integer");
             process::exit(1);
         }
     };
