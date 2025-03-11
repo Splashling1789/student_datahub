@@ -39,7 +39,8 @@ pub fn add_time(
         }
     }
 
-    match update(entry.filter(date.eq(when)).filter(subject_id.eq(subject.id)))
+    match update(entry.filter(date.eq(when))
+        .filter(subject_id.eq(subject.id)))
         .set(dedicated_time.eq(amount))
         .execute(conn)
     {
