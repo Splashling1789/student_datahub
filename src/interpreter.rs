@@ -4,11 +4,13 @@
 //! useful functions to every command submodule.
 
 use crate::entry::EntryMode;
-use crate::{debug_println, entry, export, plan, subject, usage};
+use crate::{debug_println, entry, export, plan, status, subject, usage};
 use diesel::{Connection, SqliteConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use std::path::Path;
 use std::{env, fs, process};
+use crate::models::Period;
+use crate::plan::get_plan_arg;
 
 /// Diesel migrations constant
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
@@ -65,7 +67,7 @@ pub fn interpret(args: &mut Vec<String>) {
                 }
             }
             match option.trim() {
-                //"status" => status::display_status(),
+                "status" => status::interpret(&mut conn, args),
                 "plan" => plan::interpret(args, &mut conn),
                 "subject" => subject::interpret(args, &mut conn),
                 "add" => entry::time_setter(&mut conn, args, EntryMode::ADD),
