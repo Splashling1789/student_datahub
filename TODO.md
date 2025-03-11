@@ -19,3 +19,4 @@
 ## Optional functionality for post-versions
 - [ ] json export
 - [ ] colored subjects
+- [ ] weekly and daily objectives
