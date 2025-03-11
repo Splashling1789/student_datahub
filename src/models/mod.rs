@@ -1,4 +1,5 @@
 //! Database models and implementations.
+#![allow(dead_code)]
 
 #[doc(hidden)]
 mod entry;

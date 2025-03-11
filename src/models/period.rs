@@ -118,7 +118,7 @@ impl Period {
             .load::<Subject>(conn) {
             Ok(v) => v,
             Err(e) => {
-                eprintln!("Failed to fetch the subjects.");
+                eprintln!("Failed to fetch the subjects: {e}");
                 process::exit(1);
             }
         }

@@ -1,4 +1,4 @@
-use diesel::{IntoSql, QueryDsl};
+use diesel::{QueryDsl};
 use diesel::ExpressionMethods;
 use diesel::{RunQueryDsl, SqliteConnection};
 use diesel::dsl::sum;

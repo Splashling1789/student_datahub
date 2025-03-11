@@ -1,14 +1,13 @@
-use std::ops::Add;
 use std::process;
 use diesel::SqliteConnection;
-use crate::export::csv::csv_export;
+use csv_export::csv_export;
 use crate::export::usage::display_bad_usage;
 use crate::interpreter::get_data_dir;
 use crate::models::Period;
 use crate::plan::{get_date_arg, get_plan_arg};
 
 mod usage;
-mod csv;
+mod csv_export;
 
 enum ExportMode{
     DAILY,
