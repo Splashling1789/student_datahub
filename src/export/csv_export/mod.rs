@@ -1,3 +1,7 @@
+//! # CSV Export Module
+//! CSV exports are generated with the header `["date", subject1.short_name, subject2.short_name, ...]`. 
+//! The corresponding values below are dates and the respective study time for each date. 
+//! These 'dates' may also represent intervals, depending on the selected export mode.
 mod write_daily;
 mod write_monthly;
 mod write_weekly;
@@ -14,11 +18,15 @@ use write_weekly::write_weekly;
 use super::ExportMode;
 use crate::models::{Period, Subject};
 
+/// Datetime format for the exported filename.
 const DATETIME_FILENAME_EXPORT_FORMAT: &str = "%Y%m%d_%H%M%S";
 const WEEKDAY_START : Weekday = Weekday::Mon;
+/// Date format when exporting monthly data.
 const MONTHLY_FORMAT : &str = "%m-%Y";
 
-
+/// Gets a csv header based on the short name of the provided list of subjects.
+/// # Arguments
+/// * `subjects` - List of subjects.
 fn get_header(subjects : &Vec<Subject>) -> Vec<String> {
     let mut header = vec![String::from("date")];
     for i in subjects {
@@ -28,6 +36,9 @@ fn get_header(subjects : &Vec<Subject>) -> Vec<String> {
     header
 }
 
+/// Gets the `[csv::Writer]` for the `[PathBuf]` provided, exiting if the writter couldn't be created.
+/// # Arguments
+/// * `path` - File path. 
 fn get_csv_writer(path : &PathBuf) -> Writer<File> {
     match csv::Writer::from_path(path){
         Ok(w) => w,
@@ -38,29 +49,20 @@ fn get_csv_writer(path : &PathBuf) -> Writer<File> {
     }
 }
 
+/// Gets the csv file path based on a folder path, export mode and description. It will be formatted as `"{path}{ExportMode}_{description}\_{now_datetime}"`
 fn get_file_path(path: &str, mode : &ExportMode, descr : String) -> PathBuf {
-    match mode {
-        ExportMode::DAILY => {
-            #[cfg(not(target_os = "windows"))]
-            return PathBuf::from(format!("{path}daily_{}_{}.csv", descr, Local::now().naive_local().format(DATETIME_FILENAME_EXPORT_FORMAT).to_string()));
-            #[cfg(target_os = "windows")]
-            return PathBuf::from(format!("{path}daily_{}_{}.csv", descr, Local::now().naive_local().format(DATETIME_FILENAME_EXPORT_FORMAT).to_string()));
-        },
-        ExportMode::WEEKLY => {
-            #[cfg(not(target_os = "windows"))]
-            return PathBuf::from(format!("{path}weekly_{}_{}.csv", descr, Local::now().naive_local().format(DATETIME_FILENAME_EXPORT_FORMAT).to_string()));
-            #[cfg(target_os = "windows")]
-            return PathBuf::from(format!("{path}weekly{}_{}.csv", descr, Local::now().naive_local().format(DATETIME_FILENAME_EXPORT_FORMAT).to_string()));
-        },
-        ExportMode::MONTHLY => {
-            #[cfg(not(target_os = "windows"))]
-            return PathBuf::from(format!("{path}monthly_{}_{}.csv", descr, Local::now().naive_local().format(DATETIME_FILENAME_EXPORT_FORMAT).to_string()));
-            #[cfg(target_os = "windows")]
-            return PathBuf::from(format!("{path}monthly{}_{}.csv", descr, Local::now().naive_local().format(DATETIME_FILENAME_EXPORT_FORMAT).to_string()));
-        }
-    }
+    return PathBuf::from(format!("{path}{}_{}_{}.csv", mode.to_string(), descr, Local::now().naive_local().format(DATETIME_FILENAME_EXPORT_FORMAT).to_string()));
+    #[cfg(target_os = "windows")]
+    return PathBuf::from(format!("{path}{}_{}_{}.csv", mode.to_string(), descr, Local::now().naive_local().format(DATETIME_FILENAME_EXPORT_FORMAT).to_string()));
 }
 
+/// It exports all the data from a period in a specific interval and export mode to a file in the given path.
+/// # Arguments
+/// * `conn` - Database connection
+/// * `period` - Period from which export the data.
+/// * `date_interval` - First day and last day of data.
+/// * `program_path` - Folder where will be created the data file.
+/// * `mode` - Export mode.
 pub fn csv_export(conn: &mut SqliteConnection, period : &Period, date_interval : (&NaiveDate, &NaiveDate), program_path: &str, mode : ExportMode) {
     let mut descr = period.description.clone();
     descr.truncate(10);
@@ -68,15 +70,14 @@ pub fn csv_export(conn: &mut SqliteConnection, period : &Period, date_interval :
     match mode {
         ExportMode::DAILY => {
             write_daily(conn, &path, period, date_interval);
-            println!("Succesfully exported at {}", path.into_os_string().into_string().unwrap());
         }
         ExportMode::WEEKLY => {
             write_weekly(conn, &path, period, date_interval);
-            println!("Succesfully exported at {}", path.into_os_string().into_string().unwrap());
         }
         ExportMode::MONTHLY => {
             write_monthly(conn, &path, period, date_interval);
-            println!("Succesfully exported at {}", path.into_os_string().into_string().unwrap());
+
         }
     }
+    println!("Succesfully exported at {}", path.into_os_string().into_string().unwrap());
 }

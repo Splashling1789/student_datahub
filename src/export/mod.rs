@@ -1,3 +1,5 @@
+//! # Functionallity of the export command
+//! This module handles the export of student data from the datahub into formats such as CSV.
 use std::process;
 use diesel::SqliteConnection;
 use csv_export::csv_export;
@@ -9,12 +11,31 @@ use crate::plan::{get_date_arg, get_plan_arg};
 mod usage;
 mod csv_export;
 
+/// Enum for different export modes.
+/// * `DAILY`: Export study time day by day.
+/// * `WEEKLY`: Export study time week by week.
+/// * `MONTHLY`: Export study time month by month.
 enum ExportMode{
     DAILY,
     WEEKLY,
     MONTHLY
 }
 
+impl ExportMode{
+    /// Gets the export mode name in lowercase.
+    fn to_string(&self) -> String {
+        match self {
+            ExportMode::DAILY => String::from("daily"),
+            ExportMode::WEEKLY => String::from("weekly"),
+            ExportMode::MONTHLY => String::from("monthly")
+        }
+    }
+}
+
+/// Interprets export subcommands.
+/// # Arguments
+/// * `args`: Remaining program arguments.
+/// * `conn` : Database connection.
 pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
     let plan_id = get_plan_arg(args, conn);
     if args.is_empty() || args.get(0).unwrap().starts_with("--") {

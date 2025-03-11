@@ -1,5 +1,7 @@
+//! Usage displays.
 use crate::FORMAT;
 
+/// Displays the bad usage message from export module.
 pub fn display_bad_usage() {
     println!(
         "Bad usage: {} export (mode) [--plan (plan id)] [--start (start date)] [--end (end date)]:\n\
