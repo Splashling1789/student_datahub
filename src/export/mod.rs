@@ -30,12 +30,12 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
         }
     };
     let start_date = match args.contains(&"--start".to_string()) {
-        true => Some(get_date_arg(args, "--start")),
-        false => None
+        true => get_date_arg(args, "--start"),
+        false => period.initial_date
     };
     let end_date = match args.contains(&"--end".to_string()) {
-        true => Some(get_date_arg(args, "--end")),
-        false => None
+        true => get_date_arg(args, "--end"),
+        false => period.final_date
     };
     let mut header = vec![String::from("date")];
     let subjects = period.fetch_subjects(conn);
@@ -45,16 +45,18 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
     }
     match args.get(0).unwrap().trim() {
         "daily" => {
-            csv_export(conn, period, (start_date, end_date), &*get_data_dir(), ExportMode::DAILY)
+            csv_export(conn, &period, (&start_date, &end_date), &*get_data_dir(), ExportMode::DAILY)
         },
         "weekly" => {
-            csv_export(conn, period, (start_date, end_date), &*get_data_dir(), ExportMode::WEEKLY)
+            csv_export(conn, &period, (&start_date, &end_date), &*get_data_dir(), ExportMode::WEEKLY)
         },
         "monthly" => {
-            
+            csv_export(conn, &period, (&start_date, &end_date), &*get_data_dir(), ExportMode::MONTHLY)
         },
         "all" => {
-            
+            csv_export(conn, &period, (&start_date, &end_date), &*get_data_dir(), ExportMode::DAILY);
+            csv_export(conn, &period, (&start_date, &end_date), &*get_data_dir(), ExportMode::WEEKLY);
+            csv_export(conn, &period, (&start_date, &end_date), &*get_data_dir(), ExportMode::MONTHLY);
         },
         _ => {
             display_bad_usage();
