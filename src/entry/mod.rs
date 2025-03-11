@@ -14,13 +14,13 @@ mod set;
 mod substract;
 mod usage;
 
-pub enum Mode {
+pub enum EntryMode {
     ADD,
     SUBSTRACT,
     SET,
 }
 
-pub fn time_setter(conn: &mut SqliteConnection, args: &mut Vec<String>, mode: Mode) {
+pub fn time_setter(conn: &mut SqliteConnection, args: &mut Vec<String>, mode: EntryMode) {
     let when: NaiveDate = match args.len() {
         3 => match NaiveDate::parse_from_str(&*args.get(0).unwrap().clone(), FORMAT) {
             Ok(when) => {
@@ -68,13 +68,13 @@ pub fn time_setter(conn: &mut SqliteConnection, args: &mut Vec<String>, mode: Mo
     };
 
     match mode {
-        Mode::ADD => {
+        EntryMode::ADD => {
             add_time(conn, subject, when, amount);
         }
-        Mode::SUBSTRACT => {
+        EntryMode::SUBSTRACT => {
             subtract_time(conn, subject, when, amount);
         }
-        Mode::SET => {
+        EntryMode::SET => {
             set_time(conn, subject, when, amount);
         }
     }

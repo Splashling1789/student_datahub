@@ -3,7 +3,7 @@
 //! the work to command submodules ([plan], [subject], [export]). It also provides
 //! useful functions to every command submodule.
 
-use crate::entry::Mode;
+use crate::entry::EntryMode;
 use crate::{debug_println, entry, export, plan, subject, usage};
 use diesel::{Connection, SqliteConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
@@ -68,9 +68,9 @@ pub fn interpret(args: &mut Vec<String>) {
                 //"status" => status::display_status(),
                 "plan" => plan::interpret(args, &mut conn),
                 "subject" => subject::interpret(args, &mut conn),
-                "add" => entry::time_setter(&mut conn, args, Mode::ADD),
-                "substract" => entry::time_setter(&mut conn, args, Mode::SUBSTRACT),
-                "set" => entry::time_setter(&mut conn, args, Mode::SET),
+                "add" => entry::time_setter(&mut conn, args, EntryMode::ADD),
+                "substract" => entry::time_setter(&mut conn, args, EntryMode::SUBSTRACT),
+                "set" => entry::time_setter(&mut conn, args, EntryMode::SET),
                 "export" => export::interpret(args, &mut conn),
                 _ => {}
             }
