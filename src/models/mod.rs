@@ -8,8 +8,8 @@ mod period;
 #[doc(hidden)]
 mod subject;
 
-use diesel::{Associations, Queryable, Selectable};
 use diesel::internal::derives::multiconnection::chrono::NaiveDate;
+use diesel::{Associations, Queryable, Selectable};
 
 #[derive(Queryable, Selectable, Clone, Debug)]
 #[diesel(table_name = crate::schema::entry)]

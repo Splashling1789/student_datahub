@@ -1,12 +1,12 @@
-use std::process;
-use diesel::{ExpressionMethods, RunQueryDsl};
-use diesel::internal::derives::multiconnection::chrono::NaiveDate;
-use diesel::QueryDsl;
-use diesel::SqliteConnection;
 use crate::models::{Entry, Subject};
 use crate::schema::entry::dsl::entry;
 use crate::schema::entry::{date, subject_id};
 use crate::schema::subjects::dsl::subjects;
+use diesel::internal::derives::multiconnection::chrono::NaiveDate;
+use diesel::QueryDsl;
+use diesel::SqliteConnection;
+use diesel::{ExpressionMethods, RunQueryDsl};
+use std::process;
 
 impl Subject {
     /// Gets a formatted string with relevant data of the subject.
@@ -72,14 +72,12 @@ impl Subject {
                 .sum(),
         }
     }
-    
+
     /// Fetches all entries related to the subject.
     /// # Arguments
     /// * `conn` - Database connection
     pub fn fetch_entries(&self, conn: &mut SqliteConnection) -> Vec<Entry> {
-        match entry
-            .filter(subject_id.eq(self.id))
-            .load::<Entry>(conn) {
+        match entry.filter(subject_id.eq(self.id)).load::<Entry>(conn) {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("Failed to fetch entry: {}", e);
@@ -87,7 +85,7 @@ impl Subject {
             }
         }
     }
-    
+
     /// Fetches all subjects from the database.
     /// # Arguments:
     /// * `conn` - Database connection.

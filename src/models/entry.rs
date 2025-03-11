@@ -1,13 +1,13 @@
-use diesel::{QueryDsl};
-use diesel::ExpressionMethods;
-use diesel::{RunQueryDsl, SqliteConnection};
-use diesel::dsl::sum;
-use diesel::internal::derives::multiconnection::chrono::NaiveDate;
 use crate::models::{Entry, Period};
-use crate::schema::entry::{date, dedicated_time, subject_id};
 use crate::schema::entry::dsl::entry;
+use crate::schema::entry::{date, dedicated_time, subject_id};
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
+use diesel::dsl::sum;
+use diesel::internal::derives::multiconnection::chrono::NaiveDate;
+use diesel::ExpressionMethods;
+use diesel::QueryDsl;
+use diesel::{RunQueryDsl, SqliteConnection};
 
 impl Entry {
     /// Gets the period to which the entry belongs. If it doesn't belong to any period (it should), returns `None`.
@@ -32,37 +32,30 @@ impl Entry {
             .load::<Entry>(conn)
             .expect("Error loading entry")
     }
-    
+
     /// Fetches a vector with all entries in a given date interval.
     /// # Arguments
     /// * `conn`- Database connection
     /// * `interval` - Date interval (start, end)
-    pub fn fetch_by_interval(conn : &mut SqliteConnection, interval: (Option<NaiveDate>, Option<NaiveDate>)) -> Vec<Entry> {
+    pub fn fetch_by_interval(
+        conn: &mut SqliteConnection,
+        interval: (Option<NaiveDate>, Option<NaiveDate>),
+    ) -> Vec<Entry> {
         match interval {
-            (Some(s), Some(e)) => {
-                entry
-                    .filter(date.ge(&s))
-                    .filter(date.le(&e))
-                    .load::<Entry>(conn)
-                    .expect("Error loading entry")
-            }
-            (Some(s), None) => {
-                entry
-                    .filter(date.ge(&s))
-                    .load::<Entry>(conn)
-                    .expect("Error loading entry")
-            }
-            (None, Some(e)) => {
-                entry
-                    .filter(date.le(&e))
-                    .load::<Entry>(conn)
-                    .expect("Error loading entry")
-            }
-            (None, None) => {
-                entry
-                    .load::<Entry>(conn)
-                    .expect("Error loading entry")
-            }
+            (Some(s), Some(e)) => entry
+                .filter(date.ge(&s))
+                .filter(date.le(&e))
+                .load::<Entry>(conn)
+                .expect("Error loading entry"),
+            (Some(s), None) => entry
+                .filter(date.ge(&s))
+                .load::<Entry>(conn)
+                .expect("Error loading entry"),
+            (None, Some(e)) => entry
+                .filter(date.le(&e))
+                .load::<Entry>(conn)
+                .expect("Error loading entry"),
+            (None, None) => entry.load::<Entry>(conn).expect("Error loading entry"),
         }
     }
 
@@ -88,45 +81,40 @@ impl Entry {
         }
     }
 
-    pub fn get_time_by_interval_and_subject(conn: &mut SqliteConnection, interval: (Option<NaiveDate>, Option<NaiveDate>), subject_to_fetch: i32) -> i32 {
+    pub fn get_time_by_interval_and_subject(
+        conn: &mut SqliteConnection,
+        interval: (Option<NaiveDate>, Option<NaiveDate>),
+        subject_to_fetch: i32,
+    ) -> i32 {
         match interval {
-            (Some(s), Some(e)) => {
-                entry
-                    .select(sum(dedicated_time))
-                    .filter(subject_id.eq(&subject_to_fetch))
-                    .filter(date.ge(&s))
-                    .filter(date.le(&e))
-                    .first::<Option<i64>>(conn)
-                    .expect("Error loading entry")
-                    .unwrap_or(0) as i32
-                
-            }
-            (Some(s), None) => {
-                entry
-                    .select(sum(dedicated_time))
-                    .filter(subject_id.eq(&subject_to_fetch))
-                    .filter(date.ge(&s))
-                    .first::<Option<i64>>(conn)
-                    .expect("Error loading entry")
-                    .unwrap_or(0) as i32
-            }
-            (None, Some(e)) => {
-                entry
-                    .select(sum(dedicated_time))
-                    .filter(subject_id.eq(&subject_to_fetch))
-                    .filter(date.le(&e))
-                    .first::<Option<i64>>(conn)
-                    .expect("Error loading entry")
-                    .unwrap_or(0) as i32
-            }
-            (None, None) => {
-                entry
-            .select(sum(dedicated_time))
-                    .filter(subject_id.eq(&subject_to_fetch))
-            .first::<Option<i64>>(conn)
-            .expect("Error loading entry")
-            .unwrap_or(0) as i32
-            }
+            (Some(s), Some(e)) => entry
+                .select(sum(dedicated_time))
+                .filter(subject_id.eq(&subject_to_fetch))
+                .filter(date.ge(&s))
+                .filter(date.le(&e))
+                .first::<Option<i64>>(conn)
+                .expect("Error loading entry")
+                .unwrap_or(0) as i32,
+            (Some(s), None) => entry
+                .select(sum(dedicated_time))
+                .filter(subject_id.eq(&subject_to_fetch))
+                .filter(date.ge(&s))
+                .first::<Option<i64>>(conn)
+                .expect("Error loading entry")
+                .unwrap_or(0) as i32,
+            (None, Some(e)) => entry
+                .select(sum(dedicated_time))
+                .filter(subject_id.eq(&subject_to_fetch))
+                .filter(date.le(&e))
+                .first::<Option<i64>>(conn)
+                .expect("Error loading entry")
+                .unwrap_or(0) as i32,
+            (None, None) => entry
+                .select(sum(dedicated_time))
+                .filter(subject_id.eq(&subject_to_fetch))
+                .first::<Option<i64>>(conn)
+                .expect("Error loading entry")
+                .unwrap_or(0) as i32,
         }
     }
 }

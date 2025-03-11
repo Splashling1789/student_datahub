@@ -1,33 +1,33 @@
 //! # Functionallity of the export command
 //! This module handles the export of student data from the datahub into formats such as CSV.
-use std::process;
-use diesel::SqliteConnection;
-use csv_export::csv_export;
 use crate::export::usage::display_bad_usage;
 use crate::interpreter::get_data_dir;
 use crate::models::Period;
 use crate::plan::{get_date_arg, get_plan_arg};
+use csv_export::csv_export;
+use diesel::SqliteConnection;
+use std::process;
 
-mod usage;
 mod csv_export;
+mod usage;
 
 /// Enum for different export modes.
 /// * `DAILY`: Export study time day by day.
 /// * `WEEKLY`: Export study time week by week.
 /// * `MONTHLY`: Export study time month by month.
-enum ExportMode{
+enum ExportMode {
     DAILY,
     WEEKLY,
-    MONTHLY
+    MONTHLY,
 }
 
-impl ExportMode{
+impl ExportMode {
     /// Gets the export mode name in lowercase.
     fn to_string(&self) -> String {
         match self {
             ExportMode::DAILY => String::from("daily"),
             ExportMode::WEEKLY => String::from("weekly"),
-            ExportMode::MONTHLY => String::from("monthly")
+            ExportMode::MONTHLY => String::from("monthly"),
         }
     }
 }
@@ -36,7 +36,7 @@ impl ExportMode{
 /// # Arguments
 /// * `args`: Remaining program arguments.
 /// * `conn` : Database connection.
-pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
+pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
     let plan_id = get_plan_arg(args, conn);
     if args.is_empty() || args.get(0).unwrap().starts_with("--") {
         display_bad_usage();
@@ -51,11 +51,11 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
     };
     let start_date = match args.contains(&"--start".to_string()) {
         true => get_date_arg(args, "--start"),
-        false => period.initial_date
+        false => period.initial_date,
     };
     let end_date = match args.contains(&"--end".to_string()) {
         true => get_date_arg(args, "--end"),
-        false => period.final_date
+        false => period.final_date,
     };
     let mut header = vec![String::from("date")];
     let subjects = period.fetch_subjects(conn);
@@ -64,20 +64,50 @@ pub fn interpret(args : &mut Vec<String>, conn : &mut SqliteConnection) {
         header.push(column);
     }
     match args.get(0).unwrap().trim() {
-        "daily" => {
-            csv_export(conn, &period, (&start_date, &end_date), &*get_data_dir(), ExportMode::DAILY)
-        },
-        "weekly" => {
-            csv_export(conn, &period, (&start_date, &end_date), &*get_data_dir(), ExportMode::WEEKLY)
-        },
-        "monthly" => {
-            csv_export(conn, &period, (&start_date, &end_date), &*get_data_dir(), ExportMode::MONTHLY)
-        },
+        "daily" => csv_export(
+            conn,
+            &period,
+            (&start_date, &end_date),
+            &*get_data_dir(),
+            ExportMode::DAILY,
+        ),
+        "weekly" => csv_export(
+            conn,
+            &period,
+            (&start_date, &end_date),
+            &*get_data_dir(),
+            ExportMode::WEEKLY,
+        ),
+        "monthly" => csv_export(
+            conn,
+            &period,
+            (&start_date, &end_date),
+            &*get_data_dir(),
+            ExportMode::MONTHLY,
+        ),
         "all" => {
-            csv_export(conn, &period, (&start_date, &end_date), &*get_data_dir(), ExportMode::DAILY);
-            csv_export(conn, &period, (&start_date, &end_date), &*get_data_dir(), ExportMode::WEEKLY);
-            csv_export(conn, &period, (&start_date, &end_date), &*get_data_dir(), ExportMode::MONTHLY);
-        },
+            csv_export(
+                conn,
+                &period,
+                (&start_date, &end_date),
+                &*get_data_dir(),
+                ExportMode::DAILY,
+            );
+            csv_export(
+                conn,
+                &period,
+                (&start_date, &end_date),
+                &*get_data_dir(),
+                ExportMode::WEEKLY,
+            );
+            csv_export(
+                conn,
+                &period,
+                (&start_date, &end_date),
+                &*get_data_dir(),
+                ExportMode::MONTHLY,
+            );
+        }
         _ => {
             display_bad_usage();
             process::exit(1);
