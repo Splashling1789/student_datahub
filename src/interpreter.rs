@@ -67,7 +67,7 @@ pub fn interpret(args: &mut Vec<String>) {
                 }
             }
             match option.trim() {
-                "status" => status::interpret(&mut conn, args),
+                "status" => status::display_status(&mut conn, args),
                 "plan" => plan::interpret(args, &mut conn),
                 "subject" => subject::interpret(args, &mut conn),
                 "add" => entry::time_setter(&mut conn, args, EntryMode::ADD),

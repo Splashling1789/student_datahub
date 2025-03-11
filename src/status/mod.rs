@@ -1,16 +1,19 @@
 //! Displays a summary of study time.
 
+mod period_details;
+mod daily_summary;
+
 use std::process;
 use colored::Colorize;
-use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, TimeDelta};
+use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::SqliteConnection;
-use terminal_size::{terminal_size, Width};
 use crate::{FORMAT};
 use crate::models::{Entry, Period, Subject};
 use crate::plan::{get_plan_arg};
-use crate::schema::periods::initial_date;
+use crate::status::daily_summary::daily_summary;
+use crate::status::period_details::print_period_details;
 
-pub fn interpret(conn : &mut SqliteConnection, args : &mut Vec<String>) {
+pub fn display_status(conn : &mut SqliteConnection, args : &mut Vec<String>) {
     let plan_id = get_plan_arg(args, conn);
     let period = Period::from_id(conn, plan_id).unwrap();
     let date = match args.is_empty() {
@@ -30,50 +33,9 @@ pub fn interpret(conn : &mut SqliteConnection, args : &mut Vec<String>) {
     }
 
     let total_time_studied = times.iter().map(|(_, t)| t).sum::<i32>();
-
     println!("Current plan: {} (ID:{})", period.description, period.id);
-    if date == period.initial_date {
-        print!("{}", date.format(FORMAT).to_string().green())
-    }
-    else {
-        print!("{}", period.initial_date.format(FORMAT).to_string());
-    }
+    print_period_details(&period, &date);
+    daily_summary(total_time_studied, &times);
     
-    if (date - period.initial_date).num_days() == 1 {
-        print!(" - {}", date.format(FORMAT).to_string().green());
-    }
-    else if (date - period.initial_date).num_days() > 1 {
-        print!(" - ... - {}", date.format(FORMAT).to_string().green());
-    }
-        
-    if (period.final_date - date).num_days() == 1 {
-        print!(" - {}", period.final_date.format(FORMAT).to_string());
-    }
-    else if (period.final_date - date).num_days() > 1 {
-        print!(" - ... - {}", period.final_date.format(FORMAT).to_string());
-    }
-    println!();
-    {
-        let line_longitude = match terminal_size() {
-            Some((Width(w), _)) => w as i32 / 3,
-            None => 30,
-        };
-        for _ in 0..line_longitude {
-            print!("-");
-        }
-        println!();
-    }
-    
-    if total_time_studied > 0 {
-        println!("\tYou have studied a total amount of {total_time_studied} minutes:");
-        for i in &times {
-            if(i.1 != 0) {
-                println!("\t * {} minutes were dedicated on {}", i.1, i.0.name);
-            }
-        }
-    }
-    else {
-        println!("\tYou haven't studied today yet!");
-    }
     
 }
