@@ -1,6 +1,5 @@
 use colored::Colorize;
 use diesel::internal::derives::multiconnection::chrono::NaiveDate;
-use terminal_size::{terminal_size, Width};
 use crate::FORMAT;
 use crate::models::Period;
 
@@ -26,14 +25,5 @@ pub fn print_period_details(period : &Period, date : &NaiveDate) {
         print!(" - ... - {}", period.final_date.format(FORMAT).to_string());
     }
     println!();
-    
-        let line_longitude = match terminal_size() {
-            Some((Width(w), _)) => w as i32 / 3,
-            None => 30,
-        };
-        for _ in 0..line_longitude {
-            print!("-");
-        }
-        println!();
     
 }

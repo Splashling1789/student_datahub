@@ -4,7 +4,7 @@ use crate::schema::entry::{date, dedicated_time, subject_id};
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
 use diesel::dsl::sum;
-use diesel::internal::derives::multiconnection::chrono::NaiveDate;
+use diesel::internal::derives::multiconnection::chrono::{NaiveDate, NaiveWeek};
 use diesel::ExpressionMethods;
 use diesel::QueryDsl;
 use diesel::{RunQueryDsl, SqliteConnection};
@@ -83,38 +83,20 @@ impl Entry {
 
     pub fn get_time_by_interval_and_subject(
         conn: &mut SqliteConnection,
-        interval: (Option<NaiveDate>, Option<NaiveDate>),
+        interval: (NaiveDate, NaiveDate),
         subject_to_fetch: i32,
     ) -> i32 {
-        match interval {
-            (Some(s), Some(e)) => entry
-                .select(sum(dedicated_time))
-                .filter(subject_id.eq(&subject_to_fetch))
-                .filter(date.ge(&s))
-                .filter(date.le(&e))
-                .first::<Option<i64>>(conn)
-                .expect("Error loading entry")
-                .unwrap_or(0) as i32,
-            (Some(s), None) => entry
-                .select(sum(dedicated_time))
-                .filter(subject_id.eq(&subject_to_fetch))
-                .filter(date.ge(&s))
-                .first::<Option<i64>>(conn)
-                .expect("Error loading entry")
-                .unwrap_or(0) as i32,
-            (None, Some(e)) => entry
-                .select(sum(dedicated_time))
-                .filter(subject_id.eq(&subject_to_fetch))
-                .filter(date.le(&e))
-                .first::<Option<i64>>(conn)
-                .expect("Error loading entry")
-                .unwrap_or(0) as i32,
-            (None, None) => entry
-                .select(sum(dedicated_time))
-                .filter(subject_id.eq(&subject_to_fetch))
-                .first::<Option<i64>>(conn)
-                .expect("Error loading entry")
-                .unwrap_or(0) as i32,
-        }
+        entry
+            .select(sum(dedicated_time))
+            .filter(subject_id.eq(&subject_to_fetch))
+            .filter(date.ge(&interval.0))
+            .filter(date.le(&interval.1))
+            .first::<Option<i64>>(conn)
+            .expect("Error loading entry")
+            .unwrap_or(0) as i32
+    }
+    
+    pub fn get_time_by_week_and_subject(conn: &mut SqliteConnection, week: NaiveWeek, subject_to_fetch: i32) -> i32 {
+        Self::get_time_by_interval_and_subject(conn, (week.first_day(), week.last_day()), subject_to_fetch)
     }
 }

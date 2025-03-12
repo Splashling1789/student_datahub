@@ -40,7 +40,7 @@ pub(super) fn write_monthly(
             record.push(
                 Entry::get_time_by_interval_and_subject(
                     conn,
-                    (Some(interval_to_fetch.0), Some(interval_to_fetch.1)),
+                    interval_to_fetch,
                     j.id,
                 )
                 .to_string(),

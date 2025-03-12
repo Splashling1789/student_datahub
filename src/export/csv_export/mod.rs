@@ -9,7 +9,7 @@ mod write_weekly;
 use super::ExportMode;
 use crate::models::{Period, Subject};
 use csv::Writer;
-use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, Weekday};
+use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::SqliteConnection;
 use std::fs::File;
 use std::path::PathBuf;
@@ -20,7 +20,6 @@ use write_weekly::write_weekly;
 
 /// Datetime format for the exported filename.
 const DATETIME_FILENAME_EXPORT_FORMAT: &str = "%Y%m%d_%H%M%S";
-const WEEKDAY_START: Weekday = Weekday::Mon;
 /// Date format when exporting monthly data.
 const MONTHLY_FORMAT: &str = "%m-%Y";
 

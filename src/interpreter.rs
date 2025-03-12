@@ -9,8 +9,6 @@ use diesel::{Connection, SqliteConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use std::path::Path;
 use std::{env, fs, process};
-use crate::models::Period;
-use crate::plan::get_plan_arg;
 
 /// Diesel migrations constant
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
