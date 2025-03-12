@@ -14,7 +14,7 @@ mod status;
 
 use std::env;
 /// Date format for [NaiveDate::parse_from_str][diesel::internal::derives::multiconnection::chrono::NaiveDate::parse_from_str] method
-pub const FORMAT: &str = "%m-%d-%Y";
+pub const FORMAT: &str = "%d-%m-%Y";
 
 /// It prints a formatted message (just like println! would), with '\[DEBUG]' prefix and colored in yellow.
 #[macro_export]
