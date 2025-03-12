@@ -18,6 +18,7 @@
  - [ ] put debug_println! in better places
  - [ ] tests
 ## Optional functionality for post-versions
+- [ ] marks export
 - [ ] json export
 - [ ] colored subjects
 - [ ] weekly and daily objectives
