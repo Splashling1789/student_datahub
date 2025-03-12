@@ -4,7 +4,7 @@
  - [x] entries add, substract and set
  - [x] using home directory for database
  - [x] csv export
- - [ ] status command
+ - [x] status command
  - [ ] hours and minutes display for dedicated time
 
 ## Code cleaning
@@ -12,6 +12,7 @@
  - [x] subject module reorganized
  - [ ] avoid redundant code repetition
  - [ ] docs
+ - [ ] better queries
 
 ## Optional code cleaning
  - [ ] put debug_println! in better places
