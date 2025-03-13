@@ -1,12 +1,12 @@
 use super::{get_csv_writer, get_header};
-use crate::models::{Entry, Period};
+use crate::models::Period;
+use crate::status::WEEKDAY_START;
 use crate::FORMAT;
 use diesel::internal::derives::multiconnection::chrono::{NaiveDate, TimeDelta};
 use diesel::SqliteConnection;
 use std::ops::Add;
 use std::path::PathBuf;
 use std::process;
-use crate::status::WEEKDAY_START;
 
 /// Writes the period study time data by weeks.
 /// # Arguments
@@ -47,12 +47,8 @@ pub(super) fn write_weekly(
         ));
         for j in &subjects {
             record.push(
-                Entry::get_time_by_interval_and_subject(
-                    conn,
-                    interval_to_fetch,
-                    j.id,
-                )
-                .to_string(),
+                j.total_dedicated_time_interval(conn, interval_to_fetch)
+                    .to_string(),
             );
         }
         match writer.write_record(record) {

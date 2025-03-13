@@ -39,7 +39,10 @@ pub fn get_subject(
                 Ok(s) => {
                     if s.len() > 1 && plan_id.is_some() {
                         debug_println!("There is more than one subject with same short name.");
-                        s.iter().filter(|s| s.period_id == plan_id.unwrap()).next().cloned()
+                        s.iter()
+                            .filter(|s| s.period_id == plan_id.unwrap())
+                            .next()
+                            .cloned()
                     } else {
                         s.first().cloned()
                     }

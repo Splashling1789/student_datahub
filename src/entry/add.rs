@@ -1,5 +1,5 @@
 //! Add time command
-use crate::models::{Entry, Subject};
+use crate::models::Subject;
 use crate::schema::entry::dsl::entry;
 use crate::schema::entry::{date, dedicated_time, subject_id};
 use diesel::dsl::insert_into;
@@ -20,7 +20,7 @@ pub fn add_time(
     when: NaiveDate,
     amount_to_add: i32,
 ) {
-    let amount = Entry::get_time_by_day_and_subject(when, subject.id, conn) + amount_to_add;
+    let amount = subject.total_dedicated_time_day(when, conn) + amount_to_add;
     // If there was no previous entries, it creates one.
     if amount == amount_to_add {
         match insert_into(entry)
@@ -39,10 +39,13 @@ pub fn add_time(
         }
     }
 
-    match update(entry.filter(date.eq(when))
-        .filter(subject_id.eq(subject.id)))
-        .set(dedicated_time.eq(amount))
-        .execute(conn)
+    match update(
+        entry
+            .filter(date.eq(when))
+            .filter(subject_id.eq(subject.id)),
+    )
+    .set(dedicated_time.eq(amount))
+    .execute(conn)
     {
         Ok(_) => {
             println!("Entry added successfully. Current amount: {amount}");

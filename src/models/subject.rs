@@ -2,7 +2,7 @@ use crate::models::{Entry, Subject};
 use crate::schema::entry::dsl::entry;
 use crate::schema::entry::{date, subject_id};
 use crate::schema::subjects::dsl::subjects;
-use diesel::internal::derives::multiconnection::chrono::NaiveDate;
+use diesel::internal::derives::multiconnection::chrono::{NaiveDate, NaiveWeek};
 use diesel::QueryDsl;
 use diesel::SqliteConnection;
 use diesel::{ExpressionMethods, RunQueryDsl};
@@ -41,35 +41,40 @@ impl Subject {
     pub fn total_dedicated_time_interval(
         &self,
         conn: &mut SqliteConnection,
-        interval: (Option<NaiveDate>, Option<NaiveDate>),
+        interval: (NaiveDate, NaiveDate),
     ) -> i32 {
-        match interval {
-            (None, None) => self.total_dedicated_time(conn),
-            (Some(k), None) => entry
-                .filter(subject_id.eq(self.id))
-                .filter(date.ge(k))
-                .load::<Entry>(conn)
-                .expect("Error loading entry")
-                .iter()
-                .map(|e| e.dedicated_time)
-                .sum(),
-            (None, Some(k)) => entry
-                .filter(subject_id.eq(self.id))
-                .filter(date.le(k))
-                .load::<Entry>(conn)
-                .expect("Error loading entry")
-                .iter()
-                .map(|e| e.dedicated_time)
-                .sum(),
-            (Some(k), Some(j)) => entry
-                .filter(subject_id.eq(self.id))
-                .filter(date.ge(k))
-                .filter(date.le(j))
-                .load::<Entry>(conn)
-                .expect("Error loading entry")
-                .iter()
-                .map(|e| e.dedicated_time)
-                .sum(),
+        entry
+            .filter(subject_id.eq(self.id))
+            .filter(date.ge(interval.0))
+            .filter(date.le(interval.1))
+            .load::<Entry>(conn)
+            .expect("Error loading entry")
+            .iter()
+            .map(|e| e.dedicated_time)
+            .sum()
+    }
+    pub fn total_dedicated_time_week(&self, conn: &mut SqliteConnection, week: NaiveWeek) -> i32 {
+        self.total_dedicated_time_interval(conn, (week.first_day(), week.last_day()))
+    }
+    /// Gets the dedicated time to a subject in a determined day. If there was no entry regarding that date, returns zero.
+    /// # Arguments
+    /// * `date_to_fetch` - date to search.
+    /// * `subject_to_fetch` - subject id to search.
+    /// * `conn` - connection to the database.
+    pub fn total_dedicated_time_day(
+        &self,
+        date_to_fetch: NaiveDate,
+        conn: &mut SqliteConnection,
+    ) -> i32 {
+        match entry
+            .filter(date.eq(&date_to_fetch))
+            .filter(subject_id.eq(self.id))
+            .load::<Entry>(conn)
+            .expect("Failed to fetch entries")
+            .first()
+        {
+            Some(e) => e.dedicated_time,
+            None => 0,
         }
     }
 

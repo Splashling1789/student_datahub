@@ -1,10 +1,9 @@
 use crate::models::{Entry, Period};
+use crate::schema::entry::date;
 use crate::schema::entry::dsl::entry;
-use crate::schema::entry::{date, dedicated_time, subject_id};
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
-use diesel::dsl::sum;
-use diesel::internal::derives::multiconnection::chrono::{NaiveDate, NaiveWeek};
+use diesel::internal::derives::multiconnection::chrono::NaiveDate;
 use diesel::ExpressionMethods;
 use diesel::QueryDsl;
 use diesel::{RunQueryDsl, SqliteConnection};
@@ -57,46 +56,5 @@ impl Entry {
                 .expect("Error loading entry"),
             (None, None) => entry.load::<Entry>(conn).expect("Error loading entry"),
         }
-    }
-
-    /// Gets the dedicated time to a subject in a determined day. If there was no entry regarding that date, returns zero.
-    /// # Arguments
-    /// * `date_to_fetch` - date to search.
-    /// * `subject_to_fetch` - subject id to search.
-    /// * `conn` - connection to the database.
-    pub fn get_time_by_day_and_subject(
-        date_to_fetch: NaiveDate,
-        subject_to_fetch: i32,
-        conn: &mut SqliteConnection,
-    ) -> i32 {
-        match entry
-            .filter(date.eq(&date_to_fetch))
-            .filter(subject_id.eq(&subject_to_fetch))
-            .load::<Entry>(conn)
-            .expect("Failed to fetch entries")
-            .first()
-        {
-            Some(e) => e.dedicated_time,
-            None => 0,
-        }
-    }
-
-    pub fn get_time_by_interval_and_subject(
-        conn: &mut SqliteConnection,
-        interval: (NaiveDate, NaiveDate),
-        subject_to_fetch: i32,
-    ) -> i32 {
-        entry
-            .select(sum(dedicated_time))
-            .filter(subject_id.eq(&subject_to_fetch))
-            .filter(date.ge(&interval.0))
-            .filter(date.le(&interval.1))
-            .first::<Option<i64>>(conn)
-            .expect("Error loading entry")
-            .unwrap_or(0) as i32
-    }
-    
-    pub fn get_time_by_week_and_subject(conn: &mut SqliteConnection, week: NaiveWeek, subject_to_fetch: i32) -> i32 {
-        Self::get_time_by_interval_and_subject(conn, (week.first_day(), week.last_day()), subject_to_fetch)
     }
 }

@@ -8,9 +8,9 @@ mod interpreter;
 mod models;
 mod plan;
 mod schema;
+mod status;
 mod subject;
 mod usage;
-mod status;
 
 use std::env;
 /// Date format for [NaiveDate::parse_from_str][diesel::internal::derives::multiconnection::chrono::NaiveDate::parse_from_str] method

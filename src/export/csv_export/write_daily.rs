@@ -1,5 +1,5 @@
 use crate::export::csv_export::{get_csv_writer, get_header};
-use crate::models::{Entry, Period};
+use crate::models::Period;
 use crate::FORMAT;
 use diesel::internal::derives::multiconnection::chrono::{NaiveDate, TimeDelta};
 use diesel::SqliteConnection;
@@ -33,7 +33,7 @@ pub(super) fn write_daily(
         let mut record: Vec<String> = Vec::new();
         record.push(i.format(FORMAT).to_string());
         for j in &subjects {
-            record.push(Entry::get_time_by_day_and_subject(i, j.id, conn).to_string());
+            record.push(j.total_dedicated_time_day(i, conn).to_string());
         }
         match writer.write_record(record) {
             Ok(_) => {}

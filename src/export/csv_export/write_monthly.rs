@@ -1,5 +1,5 @@
 use crate::export::csv_export::{get_csv_writer, get_header, MONTHLY_FORMAT};
-use crate::models::{Entry, Period};
+use crate::models::Period;
 use diesel::internal::derives::multiconnection::chrono::{Datelike, NaiveDate};
 use diesel::SqliteConnection;
 use std::path::PathBuf;
@@ -38,12 +38,8 @@ pub(super) fn write_monthly(
         record.push(format!("{}", i.format(MONTHLY_FORMAT)));
         for j in &subjects {
             record.push(
-                Entry::get_time_by_interval_and_subject(
-                    conn,
-                    interval_to_fetch,
-                    j.id,
-                )
-                .to_string(),
+                j.total_dedicated_time_interval(conn, interval_to_fetch)
+                    .to_string(),
             );
         }
         match writer.write_record(record) {

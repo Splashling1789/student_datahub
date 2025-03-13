@@ -1,5 +1,5 @@
 //! Substract time command
-use crate::models::{Entry, Subject};
+use crate::models::Subject;
 use crate::schema::entry::dsl::entry;
 use crate::schema::entry::{date, dedicated_time, subject_id};
 use diesel::dsl::delete;
@@ -21,7 +21,7 @@ pub fn subtract_time(
     amount_to_substract: i32,
 ) {
     let amount = std::cmp::max(
-        Entry::get_time_by_day_and_subject(when, subject.id, conn) - amount_to_substract,
+        subject.total_dedicated_time_day(when, conn) - amount_to_substract,
         0,
     );
     if amount == 0 {
