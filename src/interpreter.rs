@@ -104,3 +104,16 @@ pub fn request_confirmation(warn: &str) {
         process::exit(0);
     }
 }
+
+pub fn detect_unknown_arg(args : &Vec<String>, options : &Vec<&str>, pattern : &str) -> Option<String> {
+    for i in args {
+        if i.starts_with(pattern) {
+            for j in options {
+                if i.ne(j) {
+                    return Some(i.to_string());
+                }
+            }
+        }
+    }
+    None
+}

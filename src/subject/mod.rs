@@ -8,7 +8,7 @@ mod remove;
 mod usage;
 
 use crate::debug_println;
-use crate::interpreter::{get_specific_arg, request_confirmation};
+use crate::interpreter::{detect_unknown_arg, get_specific_arg, request_confirmation};
 use crate::models::Subject;
 use crate::plan::get_plan_arg;
 use crate::schema::subjects::dsl::subjects;
@@ -82,8 +82,12 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                 add::add(conn, plan_id, new_short_name, new_name);
             }
             "modify" => {
-                // TODO: Detect whether an uknown argument has been inputed. In that case, the program should display bad usage.
                 if args.len() < 1 {
+                    display_bad_usage();
+                    process::exit(1);
+                }
+                if let Some (o) = detect_unknown_arg(args, &vec!["--name", "--short-name"], "--") {
+                    eprintln!("Unknown argument: {o}");
                     display_bad_usage();
                     process::exit(1);
                 }
