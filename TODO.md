@@ -10,6 +10,7 @@
 ## Code cleaning
  - [x] plan module reorganized
  - [x] subject module reorganized
+ - [ ] database connection handler module
  - [ ] avoid redundant code repetition
  - [ ] docs
  - [ ] better queries
