@@ -108,10 +108,15 @@ pub fn request_confirmation(warn: &str) {
 pub fn detect_unknown_arg(args : &Vec<String>, options : &Vec<&str>, pattern : &str) -> Option<String> {
     for i in args {
         if i.starts_with(pattern) {
+            let mut found = false;
             for j in options {
-                if i.ne(j) {
-                    return Some(i.to_string());
+                if i.eq(j) {
+                    found = true;
+                    break;
                 }
+            }
+            if !found {
+                return Some(i.to_string());
             }
         }
     }
