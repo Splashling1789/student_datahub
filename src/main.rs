@@ -27,6 +27,13 @@ macro_rules! debug_println {
     };
 }
 
+pub fn format_hours_and_minutes(time : i32) -> String {
+    if time / 60 == 0 {
+        format!("{}min", time)
+    }
+    else {format!("{}h {}min", time / 60, time % 60)}
+}
+
 fn main() {
     let mut args = env::args().collect::<Vec<String>>();
     args.remove(0);

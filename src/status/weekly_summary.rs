@@ -1,4 +1,4 @@
-use crate::debug_println;
+use crate::{debug_println, format_hours_and_minutes};
 use crate::models::Subject;
 
 pub(super) fn weekly_summary(
@@ -8,15 +8,16 @@ pub(super) fn weekly_summary(
     average: Option<f32>,
 ) {
     if total_time_studied > 0 {
-        println!("\tThis week you have studied {total_time_studied} minutes:");
+        println!("\tThis week you have studied {} minutes:", format_hours_and_minutes(total_time_studied));
         for i in times {
             if i.1 != 0 {
-                println!("\t * {} minutes were dedicated on {}", i.1, i.0.name);
+                println!("\t * {} minutes were dedicated on {}", format_hours_and_minutes(i.1), i.0.name);
             }
         }
         if let Some(last_week) = last_week {
             println!();
             if last_week != 0 {
+                debug_println!("Last week studied: {}", last_week);
                 match total_time_studied as f32 / (last_week as f32) {
                     k @ 0.0..1.0 => {
                         println!(
@@ -44,6 +45,7 @@ pub(super) fn weekly_summary(
             }
         }
         if let Some(average) = average {
+            debug_println!("avg: {average}");
             if average != 0.0 {
                 match total_time_studied as f32 / average {
                     k @ 0.0..1.0 => {

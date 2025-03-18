@@ -1,6 +1,7 @@
 use crate::models::{Period, Subject};
 use diesel::SqliteConnection;
 use std::process;
+use crate::format_hours_and_minutes;
 
 pub fn list(conn: &mut SqliteConnection, plan_id: i32) {
     let plan = match Period::fetch_all_plans(conn)
@@ -29,7 +30,7 @@ pub fn list(conn: &mut SqliteConnection, plan_id: i32) {
         println!("No subjects from this period");
     } else {
         for s in subjects_from_plan {
-            println!("{}, TDT: {}", s.to_string(), s.total_dedicated_time(conn));
+            println!("{}, TDT: {}", s.to_string(), format_hours_and_minutes(s.total_dedicated_time(conn)));
         }
     }
 }
