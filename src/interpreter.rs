@@ -66,9 +66,15 @@ pub fn request_confirmation(warn: &str) {
     }
 }
 
-pub fn detect_unknown_arg(args : &Vec<String>, options : &Vec<&str>, pattern : &str) -> Option<String> {
+/// It searches for arguments that matches a prefix and are not in a given vector, and returns (if any) the first found.
+/// This is used for some commands that require options starting with '--', so that the user doesn't input wrong options.
+/// # Arguments
+/// * `args` - Arguments.
+/// * `options` - Arguments that should be in the arguments.
+/// * `prefix` - Prefix to select arguments.
+pub fn detect_unknown_arg(args : &Vec<String>, options : &Vec<&str>, prefix: &str) -> Option<String> {
     for i in args {
-        if i.starts_with(pattern) {
+        if i.starts_with(prefix) {
             let mut found = false;
             for j in options {
                 if i.eq(j) {

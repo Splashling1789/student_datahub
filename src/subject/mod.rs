@@ -18,6 +18,12 @@ use diesel::QueryDsl;
 use diesel::{ExpressionMethods, RunQueryDsl, SqliteConnection};
 use std::process;
 
+/// It interprets a Subject argument. If the argument is a number, it will fetch it by id. If it is not a number, it will
+/// fetch it by short name, using the provided plan_id.
+/// # Arguments
+/// * `subject_arg` - Subject argument
+/// * `conn` - Database connection
+/// * `plan_id` - Plan id in order to fetch by short name
 pub fn get_subject(
     subject_arg: &String,
     conn: &mut SqliteConnection,
@@ -60,6 +66,10 @@ pub fn get_subject(
     }
 }
 
+/// Interprets subject subcommands.
+/// # Arguments
+/// * `args` - Remaining program arguments.
+/// * `conn` - Database connection.
 pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
     if args.len() == 0 {
         display_bad_usage()
