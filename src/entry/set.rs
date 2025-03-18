@@ -15,7 +15,7 @@ use std::process;
 /// * `subject` - Subject studied.
 /// * `when` - Date when studied.
 /// * `amount` - Amount to set.
-pub fn set_time(conn: &mut SqliteConnection, subject: Subject, when: NaiveDate, amount: i32) {
+pub fn set_time(conn: &mut SqliteConnection, subject: &Subject, when: NaiveDate, amount: i32) {
     if amount == 0 {
         match delete(
             entry
@@ -25,7 +25,6 @@ pub fn set_time(conn: &mut SqliteConnection, subject: Subject, when: NaiveDate, 
         .execute(conn)
         {
             Ok(_) => {
-                println!("Entry added successfully. Current amount: {amount}");
             }
             Err(e) => {
                 eprintln!("Failed to set entry: {e}");
@@ -52,7 +51,6 @@ pub fn set_time(conn: &mut SqliteConnection, subject: Subject, when: NaiveDate, 
                         .execute(conn)
                     {
                         Ok(_) => {
-                            println!("Entry set successfully. Current amount: {amount}");
                         }
                         Err(e) => {
                             eprintln!("Failed to set entry: {e}");
@@ -60,7 +58,6 @@ pub fn set_time(conn: &mut SqliteConnection, subject: Subject, when: NaiveDate, 
                         }
                     }
                 } else {
-                    println!("Entry set successfully. Current amount: {amount}");
                 }
             }
             Err(e) => {

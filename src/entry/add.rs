@@ -16,7 +16,7 @@ use std::process;
 /// * `amount_to_add` - Amount to add to the current time.
 pub fn add_time(
     conn: &mut SqliteConnection,
-    subject: Subject,
+    subject: &Subject,
     when: NaiveDate,
     amount_to_add: i32,
 ) {
@@ -48,7 +48,6 @@ pub fn add_time(
     .execute(conn)
     {
         Ok(_) => {
-            println!("Entry added successfully. Current amount: {amount}");
         }
         Err(e) => {
             eprintln!("Failed to insert entry: {e}");

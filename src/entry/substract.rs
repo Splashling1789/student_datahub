@@ -16,7 +16,7 @@ use std::process;
 /// * `amount_to_substract` - Amount to substract to the current time.
 pub fn subtract_time(
     conn: &mut SqliteConnection,
-    subject: Subject,
+    subject: &Subject,
     when: NaiveDate,
     amount_to_substract: i32,
 ) {
@@ -33,7 +33,6 @@ pub fn subtract_time(
         .execute(conn)
         {
             Ok(_) => {
-                println!("Entry added successfully. Current amount: {amount}");
             }
             Err(e) => {
                 eprintln!("Failed to delete entry: {e}");
@@ -50,7 +49,6 @@ pub fn subtract_time(
         .execute(conn)
         {
             Ok(_) => {
-                println!("Entry added successfully. Current amount: {amount}");
             }
             Err(e) => {
                 eprintln!("Failed to insert entry: {e}");

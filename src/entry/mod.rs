@@ -6,7 +6,7 @@ use crate::entry::substract::subtract_time;
 use crate::entry::usage::display_bad_usage;
 use crate::models::Period;
 use crate::subject::get_subject;
-use crate::FORMAT;
+use crate::{format_hours_and_minutes, FORMAT};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::SqliteConnection;
 use std::process;
@@ -80,13 +80,14 @@ pub fn time_setter(conn: &mut SqliteConnection, args: &mut Vec<String>, mode: En
 
     match mode {
         EntryMode::ADD => {
-            add_time(conn, subject, when, amount);
+            add_time(conn, &subject, when, amount);
         }
         EntryMode::SUBSTRACT => {
-            subtract_time(conn, subject, when, amount);
+            subtract_time(conn, &subject, when, amount);
         }
         EntryMode::SET => {
-            set_time(conn, subject, when, amount);
+            set_time(conn, &subject, when, amount);
         }
     }
+    println!("Done! Current dedicated time today: {}", format_hours_and_minutes(subject.total_dedicated_time_day(when, conn)));
 }
