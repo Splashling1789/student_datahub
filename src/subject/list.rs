@@ -1,8 +1,13 @@
+//! Handles subject listing.
 use crate::models::{Period, Subject};
 use diesel::SqliteConnection;
 use std::process;
 use crate::format_hours_and_minutes;
 
+/// Lists all subjects from a given plan.
+/// #Arguments
+/// * `conn` - Database connection.
+/// * `plan_id` - Id of the plan.
 pub fn list(conn: &mut SqliteConnection, plan_id: i32) {
     let plan = match Period::fetch_all_plans(conn)
         .iter()

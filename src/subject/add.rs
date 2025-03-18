@@ -1,3 +1,4 @@
+///! Handles subject adding.
 use crate::models::Subject;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{name, period_id, short_name};
@@ -6,6 +7,12 @@ use diesel::ExpressionMethods;
 use diesel::{RunQueryDsl, SqliteConnection};
 use std::process;
 
+/// Adds a new subject with given data.
+/// # Arguments
+/// * `conn` - Database connection
+/// * `new_plan` - Id of the period of the new subject.
+/// * `new_short_name` - Short name of the new subject.
+/// * `new_name` - Name of the new subject.
 pub fn add(conn: &mut SqliteConnection, new_plan: i32, new_short_name: String, new_name: String) {
     // Two subjects from the same plan can't have the same short name.
     if Subject::fetch_all(conn)

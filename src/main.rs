@@ -39,7 +39,7 @@ pub fn format_hours_and_minutes(time : i32) -> String {
     else {format!("{}h {}min", time / 60, time % 60)}
 }
 
-/// It gets a String with the path of the program data folder. If it doesn't exist, it creates it.
+/// It gets a String with the path of the program data folder. If it doesn't exist, then it's created.
 /// Note that depending on the OS the data dir will be different.
 /// * If the OS is Windows, the folder will be `%APPDATA%\.student_datahub`
 /// * Else (assumming it will be a UNIX-like OS like Linux or macOS), the folder will be `%HOME%/.student_datahub`

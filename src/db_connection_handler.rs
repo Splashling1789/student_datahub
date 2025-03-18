@@ -1,3 +1,4 @@
+//! Handles the connection to the database
 use std::{env, process};
 use diesel::{Connection, SqliteConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
@@ -6,6 +7,7 @@ use crate::{debug_println, get_data_dir};
 /// Diesel migrations constant
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
+/// It returns the connection path as a String.
 fn get_connection_string() -> String {
     format!("{}{}",
         get_data_dir(),
@@ -13,6 +15,7 @@ fn get_connection_string() -> String {
     )
 }
 
+/// It stablishes an SQLite connection, runs the pending migrations and returns the connection itself.
 pub fn stablish_and_run_migrations() -> SqliteConnection {
     dotenv::dotenv().ok();
     let conn = get_connection_string();

@@ -1,4 +1,4 @@
-//! Manages commands related to subjects.
+//! Handles commands related to subjects.
 
 mod add;
 mod list;
