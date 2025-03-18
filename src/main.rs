@@ -11,8 +11,11 @@ mod schema;
 mod status;
 mod subject;
 mod usage;
+mod db_connection_handler;
 
-use std::env;
+use std::{env, fs};
+use std::path::Path;
+
 /// Date format for [NaiveDate::parse_from_str][diesel::internal::derives::multiconnection::chrono::NaiveDate::parse_from_str] method
 pub const FORMAT: &str = "%d-%m-%Y";
 
@@ -32,6 +35,27 @@ pub fn format_hours_and_minutes(time : i32) -> String {
         format!("{}min", time)
     }
     else {format!("{}h {}min", time / 60, time % 60)}
+}
+
+pub fn get_data_dir() -> String {
+    #[cfg(target_os = "windows")]
+    let home = format!(
+        "{}\\.student_datahub\\",
+        env::var("APPDATA").expect("Failed to get HOME environment variable")
+    );
+
+    #[cfg(not(target_os = "windows"))]
+    let home = format!(
+        "{}/.student_datahub/",
+        env::var("HOME").expect("Failed to get HOME environment variable")
+    );
+
+    // We create the path if it doesn't exist.
+    let path = Path::new(&home);
+    if !path.exists() {
+        fs::create_dir_all(path).expect("No se pudo crear la carpeta");
+    }
+    home
 }
 
 fn main() {

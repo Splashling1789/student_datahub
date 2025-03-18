@@ -9,31 +9,7 @@ use diesel::{Connection, SqliteConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use std::path::Path;
 use std::{env, fs, process};
-
-/// Diesel migrations constant
-pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
-
-pub fn get_data_dir() -> String {
-    #[cfg(target_os = "windows")]
-    let home = format!(
-        "{}\\.student_datahub\\",
-        env::var("APPDATA").expect("Failed to get HOME environment variable")
-    );
-
-    #[cfg(not(target_os = "windows"))]
-    let home = format!(
-        "{}/.student_datahub/",
-        env::var("HOME").expect("Failed to get HOME environment variable")
-    );
-
-    // We create the path if it doesn't exist.
-    let path = Path::new(&home);
-    if !path.exists() {
-        fs::create_dir_all(path).expect("No se pudo crear la carpeta");
-    }
-
-    home
-}
+use crate::db_connection_handler::stablish_and_run_migrations;
 
 /// Interprets the first command of the arguments provided and delegates the work to submodule commands
 /// # Arguments
@@ -48,22 +24,7 @@ pub fn interpret(args: &mut Vec<String>) {
             let option = args.get(0).unwrap().clone();
             args.remove(0);
             debug_println!("using arg: {option}");
-            dotenv::dotenv().ok();
-            let connection_string = format!(
-                "{}{}",
-                get_data_dir(),
-                env::var("DATABASE_URL").expect("Failed to get DATABASE_URL from .env file")
-            );
-            debug_println!("connecting to {connection_string}");
-            let mut conn = SqliteConnection::establish(&connection_string).unwrap();
-
-            match conn.run_pending_migrations(MIGRATIONS) {
-                Ok(_) => (),
-                Err(err) => {
-                    eprintln!("Could not run database migrations: {err}");
-                    process::exit(1);
-                }
-            }
+            let mut conn = stablish_and_run_migrations();
             match option.trim() {
                 "status" => status::display_status(&mut conn, args),
                 "plan" => plan::interpret(args, &mut conn),
