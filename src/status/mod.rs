@@ -1,4 +1,9 @@
-//! Displays a summary of study time.
+//! # Summary of study time.
+//! The status command's prompt is divided in three parts:
+//! * **Period details**: Prints the date and description of the period.
+//! * **Daily summary**: Prints a daily summary, with the total time the user studied, and the time dedicated to every subject.
+//! * **Weekly summary**: Prints a weekly summary (if the previous week is included in the plan's period), with how much more did
+//! the user study regards the previous week, and whether they are doing better in their average.
 
 mod daily_summary;
 mod period_details;
@@ -16,6 +21,7 @@ use std::ops::Add;
 use std::process;
 use terminal_size::{terminal_size, Width};
 
+/// Day considered the first of the week.
 pub const WEEKDAY_START: Weekday = Weekday::Mon;
 
 fn print_separator() {
@@ -29,6 +35,10 @@ fn print_separator() {
     println!();
 }
 
+/// Displays the status of the plan, based on program args.
+/// # Arguments:
+/// * `conn` - Database connection.
+/// * `args` - Program arguments.
 pub fn display_status(conn: &mut SqliteConnection, args: &mut Vec<String>) {
     let plan_id = get_plan_arg(args, conn);
     let period = Period::from_id(conn, plan_id).unwrap();
@@ -99,11 +109,16 @@ pub fn display_status(conn: &mut SqliteConnection, args: &mut Vec<String>) {
     }
 }
 
-fn weekly_average_until(conn: &mut SqliteConnection, day: NaiveDate, period: Period) -> f32 {
+/// Gets the global dedicated time average by weeks until de given day.
+/// # Arguments
+/// * `conn` - Database connection.
+/// * `until` - Day which previous week is the last to be calculated.
+/// * `period` - Period to fetch times.
+fn weekly_average_until(conn: &mut SqliteConnection, until: NaiveDate, period: Period) -> f32 {
     let mut i = period.initial_date;
     let mut count = 0;
     let mut sum = 0;
-    while i.week(WEEKDAY_START).last_day() < day {
+    while i.week(WEEKDAY_START).last_day() < until {
         for j in period.fetch_subjects(conn) {
             sum += j.total_dedicated_time_week(conn, i.week(WEEKDAY_START));
         }

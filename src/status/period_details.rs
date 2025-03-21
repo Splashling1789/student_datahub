@@ -1,8 +1,13 @@
+//! Handles the header of the status command (period details and date).
 use crate::models::Period;
 use crate::FORMAT;
 use colored::Colorize;
 use diesel::internal::derives::multiconnection::chrono::NaiveDate;
 
+/// Prints the details of the given period with a given date.
+/// # Arguments
+/// * `period` - Period to print its details.
+/// * `date` - Date to print with the period details.
 pub fn print_period_details(period: &Period, date: &NaiveDate) {
     if *date == period.initial_date {
         print!("{}", date.format(FORMAT).to_string().green())

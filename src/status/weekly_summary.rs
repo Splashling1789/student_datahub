@@ -1,6 +1,13 @@
+//! Handles the weekly summary of the status command.
 use crate::{debug_println, format_hours_and_minutes};
 use crate::models::Subject;
 
+/// Prints the weekly summary of the status command.
+/// # Arguments
+/// * `total_time_studied` - Total time studied during the week.
+/// * `times` - List of (Subject, dedicated time during the week) tuples.
+/// * `last_week` - Total time studied the previous week (if any)
+/// * `average` - Weekly average so far (if any).
 pub(super) fn weekly_summary(
     total_time_studied: i32,
     times: &Vec<(Subject, i32)>,
