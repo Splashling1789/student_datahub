@@ -5,6 +5,12 @@ use diesel::ExpressionMethods;
 use diesel::{update, QueryDsl, RunQueryDsl, SqliteConnection};
 use std::process;
 
+/// Modifies an existing subject
+/// # Arguments
+/// * `conn` - Database connection.
+/// * `subj` - Subject to modify.
+/// * `new_short_name` - New subject's short name
+/// * `new_name` - New subject's name.
 pub fn modify(
     conn: &mut SqliteConnection,
     subj: Subject,

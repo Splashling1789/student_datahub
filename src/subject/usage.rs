@@ -1,3 +1,6 @@
+//! Bad usage display command.
+
+/// Displays the bad usage message from subject command
 pub fn display_bad_usage() {
     println!(
         "Bad usage: {} subject ...:\n
