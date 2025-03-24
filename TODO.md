@@ -23,3 +23,4 @@
 - [ ] json export
 - [ ] colored subjects
 - [ ] weekly and daily objectives
+- [ ] terminal autocompletion
