@@ -114,6 +114,7 @@ pub fn display_status(conn: &mut SqliteConnection, args: &mut Vec<String>) {
 /// * `conn` - Database connection.
 /// * `until` - Day which previous week is the last to be calculated.
 /// * `period` - Period to fetch times.
+// TODO: Put this in Period implementation.
 fn weekly_average_until(conn: &mut SqliteConnection, until: NaiveDate, period: Period) -> f32 {
     let mut i = period.initial_date;
     let mut count = 0;

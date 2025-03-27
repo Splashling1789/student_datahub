@@ -5,10 +5,7 @@
 
 use crate::entry::EntryMode;
 use crate::{debug_println, entry, export, plan, status, subject, usage};
-use diesel::{Connection, SqliteConnection};
-use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-use std::path::Path;
-use std::{env, fs, process};
+use std::{process};
 use crate::db_connection_handler::stablish_and_run_migrations;
 
 /// Interprets the first command of the arguments provided and delegates the work to submodule commands

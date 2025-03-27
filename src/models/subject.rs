@@ -1,12 +1,13 @@
 use crate::models::{Entry, Subject};
 use crate::schema::entry::dsl::entry;
-use crate::schema::entry::{date, subject_id};
+use crate::schema::entry::{date, dedicated_time, subject_id};
 use crate::schema::subjects::dsl::subjects;
 use diesel::internal::derives::multiconnection::chrono::{NaiveDate, NaiveWeek};
 use diesel::QueryDsl;
 use diesel::SqliteConnection;
 use diesel::{ExpressionMethods, RunQueryDsl};
 use std::process;
+use diesel::dsl::sum;
 
 impl Subject {
     /// Gets a formatted string with relevant data of the subject.
@@ -27,12 +28,11 @@ impl Subject {
     /// * `conn` - Database connection
     pub fn total_dedicated_time(&self, conn: &mut SqliteConnection) -> i32 {
         entry
+            .select(sum(dedicated_time))
             .filter(subject_id.eq(self.id))
-            .load::<Entry>(conn)
+            .first::<Option<i64>>(conn)
             .expect("Error loading entry")
-            .iter()
-            .map(|e| e.dedicated_time)
-            .sum()
+            .unwrap_or(0) as i32
     }
     /// Gets the total dedicated time of the subject in an interval.
     /// # Arguments
@@ -44,14 +44,13 @@ impl Subject {
         interval: (NaiveDate, NaiveDate),
     ) -> i32 {
         entry
+            .select(sum(dedicated_time))
             .filter(subject_id.eq(self.id))
             .filter(date.ge(interval.0))
             .filter(date.le(interval.1))
-            .load::<Entry>(conn)
+            .first::<Option<i64>>(conn)
             .expect("Error loading entry")
-            .iter()
-            .map(|e| e.dedicated_time)
-            .sum()
+            .unwrap_or(0) as i32
     }
     pub fn total_dedicated_time_week(&self, conn: &mut SqliteConnection, week: NaiveWeek) -> i32 {
         self.total_dedicated_time_interval(conn, (week.first_day(), week.last_day()))
