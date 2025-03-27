@@ -52,12 +52,12 @@ fn get_csv_writer(path: &PathBuf) -> Writer<File> {
 fn get_file_path(path: &str, mode: &ExportMode, descr: String) -> PathBuf {
     return PathBuf::from(format!(
         "{path}{}_{}_{}.csv",
-        mode.to_string(),
-        descr,
         Local::now()
             .naive_local()
             .format(DATETIME_FILENAME_EXPORT_FORMAT)
-            .to_string()
+            .to_string(),
+        descr,
+        mode.to_string(),
     ));
     #[cfg(target_os = "windows")]
     return PathBuf::from(format!(
