@@ -9,10 +9,15 @@ pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
 /// It returns the connection path as a String.
 fn get_connection_string() -> String {
-    format!("{}{}",
-        get_data_dir(),
-            env::var("DATABASE_URL").expect("Failed to get DATABASE_URL from .env file")
-    )
+    if cfg!(debug_assertions) {
+        format!("{}", env::var("DATABASE_URL").expect("Failed to get DATABASE_URL from .env file"))
+    }
+    else {
+        format!("{}{}",
+                get_data_dir(),
+                env::var("DATABASE_URL").expect("Failed to get DATABASE_URL from .env file")
+        )
+    }
 }
 
 /// It stablishes an SQLite connection, runs the pending migrations and returns the connection itself.
