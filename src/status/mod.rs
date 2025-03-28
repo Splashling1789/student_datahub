@@ -15,7 +15,7 @@ use crate::status::daily_summary::daily_summary;
 use crate::status::period_details::print_period_details;
 use crate::status::weekly_summary::weekly_summary;
 use crate::FORMAT;
-use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, TimeDelta, Weekday};
+use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, Weekday};
 use diesel::SqliteConnection;
 use std::ops::Add;
 use std::process;
@@ -102,29 +102,9 @@ pub fn display_status(conn: &mut SqliteConnection, args: &mut Vec<String>) {
             &times,
             total_previous_time,
             match last_week_final_day {
-                Some(d) => Some(weekly_average_until(conn, d, period)),
+                Some(d) => Some(period.weekly_average_until(conn, period.initial_date, d)),
                 None => None,
             },
         )
     }
-}
-
-/// Gets the global dedicated time average by weeks until de given day.
-/// # Arguments
-/// * `conn` - Database connection.
-/// * `until` - Day which previous week is the last to be calculated.
-/// * `period` - Period to fetch times.
-// TODO: Put this in Period implementation.
-fn weekly_average_until(conn: &mut SqliteConnection, until: NaiveDate, period: Period) -> f32 {
-    let mut i = period.initial_date;
-    let mut count = 0;
-    let mut sum = 0;
-    while i.week(WEEKDAY_START).last_day() < until {
-        for j in period.fetch_subjects(conn) {
-            sum += j.total_dedicated_time_week(conn, i.week(WEEKDAY_START));
-        }
-        count += 1;
-        i = i.add(TimeDelta::weeks(1));
-    }
-    (sum as f32) / (count as f32)
 }

@@ -1,14 +1,19 @@
+use std::ops::Add;
 use crate::models::{Period, Subject};
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::period_id;
 use crate::{debug_println, FORMAT};
-use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
+use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, TimeDelta};
 use diesel::ExpressionMethods;
 use diesel::QueryDsl;
 use diesel::{RunQueryDsl, SqliteConnection};
 use std::process;
+use diesel::dsl::{avg, sql};
+use crate::schema::entry::{date, dedicated_time};
+use crate::schema::entry::dsl::entry;
+use crate::status::WEEKDAY_START;
 
 impl Period {
     /// Gets a formatted string with relevant data of the period.
@@ -121,4 +126,26 @@ impl Period {
             }
         }
     }
+
+    /// Gets the global dedicated time average by weeks until de given day.
+    /// # Arguments
+    /// * `conn` - Database connection.
+    /// * `until` - Day which previous week is the last to be calculated.
+    /// * `period` - Period to fetch times.
+    pub fn weekly_average_until(&self, conn: &mut SqliteConnection, from: NaiveDate, until: NaiveDate) -> f64 {
+        let start = from.max(self.initial_date);
+        let end = until.min(self.final_date);
+        let weekly_sum = entry
+            .select((
+                sql::<diesel::sql_types::Integer>("strftime('%Y', date)"),
+                sql::<diesel::sql_types::Integer>("strftime('%W', date)"),
+                sql::<diesel::sql_types::Nullable::<diesel::sql_types::Integer>>("SUM(dedicated_time) AS suma")))
+            .filter(date.between(start, end))
+            .group_by((sql::<diesel::sql_types::Integer>("strftime('%Y', date)"),
+                       sql::<diesel::sql_types::Integer>("strftime('%W', date)")))
+            .load::<(i32,i32, Option<i32>)>(conn)
+            .expect("Failed to fetch the weekly average");
+        weekly_sum.iter().map(|t| t.2.unwrap_or(0)).sum::<i32>() as f64 / (weekly_sum.len() as f64)
+    }
+
 }

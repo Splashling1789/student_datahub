@@ -12,7 +12,7 @@ pub(super) fn weekly_summary(
     total_time_studied: i32,
     times: &Vec<(Subject, i32)>,
     last_week: Option<i32>,
-    average: Option<f32>,
+    average: Option<f64>,
 ) {
     if total_time_studied > 0 {
         println!("\tThis week you have studied {} minutes:", format_hours_and_minutes(total_time_studied));
@@ -53,13 +53,13 @@ pub(super) fn weekly_summary(
         }
         if let Some(average) = average {
             debug_println!("avg: {average}");
-            if average != 0.0 {
-                match total_time_studied as f32 / average {
+            if average != 0f64 {
+                match total_time_studied as f64 / average {
                     k @ 0.0..1.0 => {
                         println!("\t - {:.1}% less than average.", (1.0 - k) * 100.0);
                     }
                     1.0 => {}
-                    k @ 1.0..=f32::MAX => {
+                    k @ 1.0..=f64::MAX => {
                         println!("\t - {:.1}% more than weekly average.", (k - 1.0) * 100.0);
                     }
                     k => {
