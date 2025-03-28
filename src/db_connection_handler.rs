@@ -15,7 +15,7 @@ fn get_connection_string() -> String {
     else {
         format!("{}{}",
                 get_data_dir(),
-                env::var("DATABASE_URL").expect("Failed to get DATABASE_URL from .env file")
+                "data.db"
         )
     }
 }
