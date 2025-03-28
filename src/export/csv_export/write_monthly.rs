@@ -1,3 +1,4 @@
+//! Handles monthly csv export format
 use crate::export::csv_export::{get_csv_writer, get_header, MONTHLY_FORMAT};
 use crate::models::Period;
 use diesel::internal::derives::multiconnection::chrono::{Datelike, NaiveDate};

@@ -1,3 +1,4 @@
+//! Handles weekly csv export format
 use super::{get_csv_writer, get_header};
 use crate::models::Period;
 use crate::status::WEEKDAY_START;

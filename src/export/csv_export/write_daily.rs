@@ -1,3 +1,4 @@
+//! Handles daily csv export format
 use crate::export::csv_export::{get_csv_writer, get_header};
 use crate::models::Period;
 use crate::FORMAT;
