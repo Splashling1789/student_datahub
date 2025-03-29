@@ -6,9 +6,9 @@ mod remove;
 mod start;
 mod usage;
 
+use crate::commands::plan::usage::display_bad_usage;
 use crate::interpreter::{get_specific_arg, request_confirmation};
 use crate::models::Period;
-use crate::commands::plan::usage::display_bad_usage;
 use crate::{debug_println, FORMAT};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::SqliteConnection;

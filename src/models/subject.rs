@@ -2,12 +2,12 @@ use crate::models::{Entry, Subject};
 use crate::schema::entry::dsl::entry;
 use crate::schema::entry::{date, dedicated_time, subject_id};
 use crate::schema::subjects::dsl::subjects;
+use diesel::dsl::sum;
 use diesel::internal::derives::multiconnection::chrono::{NaiveDate, NaiveWeek};
 use diesel::QueryDsl;
 use diesel::SqliteConnection;
 use diesel::{ExpressionMethods, RunQueryDsl};
 use std::process;
-use diesel::dsl::sum;
 
 impl Subject {
     /// Gets a formatted string with relevant data of the subject.

@@ -1,8 +1,8 @@
 //! Handles subject listing.
+use crate::format_hours_and_minutes;
 use crate::models::{Period, Subject};
 use diesel::SqliteConnection;
 use std::process;
-use crate::format_hours_and_minutes;
 
 /// Lists all subjects from a given plan.
 /// #Arguments
@@ -21,9 +21,7 @@ pub fn list(conn: &mut SqliteConnection, plan_id: i32) {
     };
     println!(
         "Subjects from period {} ({} - {})",
-        plan.description,
-        plan.initial_date,
-        plan.final_date
+        plan.description, plan.initial_date, plan.final_date
     );
     let subjects_from_plan = Subject::fetch_all(conn)
         .iter()
@@ -34,7 +32,11 @@ pub fn list(conn: &mut SqliteConnection, plan_id: i32) {
         println!("No subjects from this period");
     } else {
         for s in subjects_from_plan {
-            println!("{}, TDT: {}", s.to_string(), format_hours_and_minutes(s.total_dedicated_time(conn)));
+            println!(
+                "{}, TDT: {}",
+                s.to_string(),
+                format_hours_and_minutes(s.total_dedicated_time(conn))
+            );
         }
     }
 }

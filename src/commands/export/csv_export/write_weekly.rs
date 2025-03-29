@@ -1,7 +1,7 @@
 //! Handles weekly csv export format
 use super::{get_csv_writer, get_header};
-use crate::models::Period;
 use crate::commands::status::WEEKDAY_START;
+use crate::models::Period;
 use crate::FORMAT;
 use diesel::internal::derives::multiconnection::chrono::{NaiveDate, TimeDelta};
 use diesel::SqliteConnection;
@@ -33,12 +33,8 @@ pub(crate) fn write_weekly(
     let mut i = *date_interval.0;
     while i.le(date_interval.1) {
         let interval_to_fetch = (
-            i.week(WEEKDAY_START)
-                .first_day()
-                .max(*date_interval.0),
-            i.week(WEEKDAY_START)
-                .last_day()
-                .min(*date_interval.1),
+            i.week(WEEKDAY_START).first_day().max(*date_interval.0),
+            i.week(WEEKDAY_START).last_day().min(*date_interval.1),
         );
         let mut record: Vec<String> = Vec::new();
         record.push(format!(

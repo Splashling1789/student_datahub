@@ -1,9 +1,9 @@
 //! # Functionallity of the export command
 //! This module handles the export of student data from the datahub into formats such as CSV.
 use crate::commands::export::usage::display_bad_usage;
+use crate::commands::plan::{get_date_arg, get_plan_arg};
 use crate::get_data_dir;
 use crate::models::Period;
-use crate::commands::plan::{get_date_arg, get_plan_arg};
 use csv_export::csv_export;
 use diesel::SqliteConnection;
 use std::process;

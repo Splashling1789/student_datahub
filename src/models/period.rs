@@ -1,17 +1,17 @@
 use crate::models::{Period, Subject};
+use crate::schema::entry::date;
+use crate::schema::entry::dsl::entry;
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::period_id;
 use crate::{debug_println, FORMAT};
+use diesel::dsl::sql;
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::ExpressionMethods;
 use diesel::QueryDsl;
 use diesel::{RunQueryDsl, SqliteConnection};
 use std::process;
-use diesel::dsl::{sql};
-use crate::schema::entry::{date};
-use crate::schema::entry::dsl::entry;
 
 impl Period {
     /// Gets a formatted string with relevant data of the period.
@@ -27,7 +27,7 @@ impl Period {
     /// It determines if the period is actual (It is ocurring now)
     pub fn is_actual(&self) -> bool {
         let now = Local::now().date_naive();
-        
+
         now >= self.initial_date && now <= self.final_date
     }
     /// It fetches all study periods.
@@ -127,20 +127,29 @@ impl Period {
     /// * `conn` - Database connection.
     /// * `until` - Day which previous week is the last to be calculated.
     /// * `period` - Period to fetch times.
-    pub fn weekly_average_until(&self, conn: &mut SqliteConnection, from: NaiveDate, until: NaiveDate) -> f64 {
+    pub fn weekly_average_until(
+        &self,
+        conn: &mut SqliteConnection,
+        from: NaiveDate,
+        until: NaiveDate,
+    ) -> f64 {
         let start = from.max(self.initial_date);
         let end = until.min(self.final_date);
         let weekly_sum = entry
             .select((
                 sql::<diesel::sql_types::Integer>("strftime('%Y', date)"),
                 sql::<diesel::sql_types::Integer>("strftime('%W', date)"),
-                sql::<diesel::sql_types::Nullable::<diesel::sql_types::Integer>>("SUM(dedicated_time) AS suma")))
+                sql::<diesel::sql_types::Nullable<diesel::sql_types::Integer>>(
+                    "SUM(dedicated_time) AS suma",
+                ),
+            ))
             .filter(date.between(start, end))
-            .group_by((sql::<diesel::sql_types::Integer>("strftime('%Y', date)"),
-                       sql::<diesel::sql_types::Integer>("strftime('%W', date)")))
-            .load::<(i32,i32, Option<i32>)>(conn)
+            .group_by((
+                sql::<diesel::sql_types::Integer>("strftime('%Y', date)"),
+                sql::<diesel::sql_types::Integer>("strftime('%W', date)"),
+            ))
+            .load::<(i32, i32, Option<i32>)>(conn)
             .expect("Failed to fetch the weekly average");
         weekly_sum.iter().map(|t| t.2.unwrap_or(0)).sum::<i32>() as f64 / (weekly_sum.len() as f64)
     }
-
 }

@@ -4,10 +4,10 @@
 //! useful functions to every command submodule.
 
 use crate::commands::entry::EntryMode;
-use crate::{debug_println, usage};
-use std::process;
 use crate::commands::{entry, export, plan, status, subject};
 use crate::db_connection_handler::stablish_and_run_migrations;
+use crate::{debug_println, usage};
+use std::process;
 
 /// Interprets the first command of the arguments provided and delegates the work to submodule commands
 /// # Arguments
@@ -70,7 +70,7 @@ pub fn request_confirmation(warn: &str) {
 /// * `args` - Arguments.
 /// * `options` - Arguments that should be in the arguments.
 /// * `prefix` - Prefix to select arguments.
-pub fn detect_unknown_arg(args : &Vec<String>, options : &Vec<&str>, prefix: &str) -> Option<String> {
+pub fn detect_unknown_arg(args: &Vec<String>, options: &Vec<&str>, prefix: &str) -> Option<String> {
     for i in args {
         if i.starts_with(prefix) {
             let mut found = false;

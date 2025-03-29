@@ -47,8 +47,7 @@ pub fn add_time(
     .set(dedicated_time.eq(amount))
     .execute(conn)
     {
-        Ok(_) => {
-        }
+        Ok(_) => {}
         Err(e) => {
             eprintln!("Failed to insert entry: {e}");
             process::exit(1);

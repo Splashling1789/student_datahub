@@ -32,8 +32,7 @@ pub fn subtract_time(
         )
         .execute(conn)
         {
-            Ok(_) => {
-            }
+            Ok(_) => {}
             Err(e) => {
                 eprintln!("Failed to delete entry: {e}");
                 process::exit(1);
@@ -48,8 +47,7 @@ pub fn subtract_time(
         .set(dedicated_time.eq(amount))
         .execute(conn)
         {
-            Ok(_) => {
-            }
+            Ok(_) => {}
             Err(e) => {
                 eprintln!("Failed to insert entry: {e}");
                 process::exit(1);

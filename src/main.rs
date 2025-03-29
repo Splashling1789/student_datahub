@@ -2,15 +2,15 @@
 //! This command-line tool lets you register the time dedicated to all your subjects of different
 //! periods (semesters or similar) in a single command. It stores the data in an SQLite database,
 //! and there are commands to export it to csv format for later data analysis.
+mod commands;
+mod db_connection_handler;
 mod interpreter;
 mod models;
 mod schema;
 mod usage;
-mod db_connection_handler;
-mod commands;
 
-use std::{env, fs};
 use std::path::Path;
+use std::{env, fs};
 
 /// Date format for [NaiveDate::parse_from_str][diesel::internal::derives::multiconnection::chrono::NaiveDate::parse_from_str] method
 pub const FORMAT: &str = "%d-%m-%Y";
@@ -25,14 +25,15 @@ macro_rules! debug_println {
     };
 }
 
-/// It builds a formatted string based on the given time (in minutes). 
+/// It builds a formatted string based on the given time (in minutes).
 /// # Arguments
 /// * `time` - Time to format, in minutes.
-pub fn format_hours_and_minutes(time : i32) -> String {
+pub fn format_hours_and_minutes(time: i32) -> String {
     if time / 60 == 0 {
         format!("{}min", time)
+    } else {
+        format!("{}h {}min", time / 60, time % 60)
     }
-    else {format!("{}h {}min", time / 60, time % 60)}
 }
 
 /// It gets a String with the path of the program data folder. If it doesn't exist, then it's created.

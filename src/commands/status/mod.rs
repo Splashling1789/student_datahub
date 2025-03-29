@@ -8,11 +8,11 @@ mod daily_summary;
 mod period_details;
 mod weekly_summary;
 
-use crate::models::{Period, Subject};
 use crate::commands::plan::get_plan_arg;
 use crate::commands::status::daily_summary::daily_summary;
 use crate::commands::status::period_details::print_period_details;
 use crate::commands::status::weekly_summary::weekly_summary;
+use crate::models::{Period, Subject};
 use crate::FORMAT;
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, Weekday};
 use diesel::SqliteConnection;

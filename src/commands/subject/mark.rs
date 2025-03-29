@@ -19,7 +19,10 @@ pub fn update_mark(conn: &mut SqliteConnection, subject: Subject, mark: Option<f
     {
         Ok(_) => match mark {
             Some(m) => {
-                println!("Successfully marked {} with score {}", subject.short_name, m);
+                println!(
+                    "Successfully marked {} with score {}",
+                    subject.short_name, m
+                );
             }
             None => {
                 println!("Successfully unmarked {}", subject.short_name);

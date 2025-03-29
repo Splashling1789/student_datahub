@@ -7,13 +7,13 @@ mod modify;
 mod remove;
 mod usage;
 
+use crate::commands::plan::get_plan_arg;
+use crate::commands::subject::usage::display_bad_usage;
 use crate::debug_println;
 use crate::interpreter::{detect_unknown_arg, get_specific_arg, request_confirmation};
 use crate::models::Subject;
-use crate::commands::plan::get_plan_arg;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{id, short_name};
-use crate::commands::subject::usage::display_bad_usage;
 use diesel::QueryDsl;
 use diesel::{ExpressionMethods, RunQueryDsl, SqliteConnection};
 use std::process;
@@ -45,9 +45,7 @@ pub fn get_subject(
                 Ok(s) => {
                     if s.len() > 1 && plan_id.is_some() {
                         debug_println!("There is more than one subject with same short name.");
-                        s.iter()
-                            .find(|s| s.period_id == plan_id.unwrap())
-                            .cloned()
+                        s.iter().find(|s| s.period_id == plan_id.unwrap()).cloned()
                     } else {
                         s.first().cloned()
                     }
@@ -95,7 +93,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                     display_bad_usage();
                     process::exit(1);
                 }
-                if let Some (o) = detect_unknown_arg(args, &vec!["--name", "--short-name"], "--") {
+                if let Some(o) = detect_unknown_arg(args, &vec!["--name", "--short-name"], "--") {
                     eprintln!("Unknown argument: {o}");
                     display_bad_usage();
                     process::exit(1);

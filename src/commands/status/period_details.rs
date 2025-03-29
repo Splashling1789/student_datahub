@@ -15,14 +15,14 @@ pub fn print_period_details(period: &Period, date: &NaiveDate) {
         print!("{}", period.initial_date.format(FORMAT));
     }
 
-    match (*date - period.initial_date).num_days()  {
+    match (*date - period.initial_date).num_days() {
         1 => print!(" - {}", date.format(FORMAT).to_string().green()),
-        _ => print!(" - ... - {}", date.format(FORMAT).to_string().green())
+        _ => print!(" - ... - {}", date.format(FORMAT).to_string().green()),
     }
-    
+
     match (period.final_date - *date).num_days() {
         1 => print!(" - {}", period.final_date.format(FORMAT)),
-        _ => print!(" - ... - {}", period.final_date.format(FORMAT))
+        _ => print!(" - ... - {}", period.final_date.format(FORMAT)),
     }
     println!();
 }

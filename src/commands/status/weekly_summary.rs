@@ -1,6 +1,6 @@
 //! Handles the weekly summary of the status command.
-use crate::{debug_println, format_hours_and_minutes};
 use crate::models::Subject;
+use crate::{debug_println, format_hours_and_minutes};
 
 /// Prints the weekly summary of the status command.
 /// # Arguments
@@ -19,10 +19,17 @@ pub(crate) fn weekly_summary(
             println!("\tYou haven't even study this week either!");
         }
         total_time_studied => {
-            println!("\tThis week you have studied {}:", format_hours_and_minutes(total_time_studied));
+            println!(
+                "\tThis week you have studied {}:",
+                format_hours_and_minutes(total_time_studied)
+            );
             for i in times {
                 if i.1 != 0 {
-                    println!("\t * {} were dedicated on {}", format_hours_and_minutes(i.1), i.0.name);
+                    println!(
+                        "\t * {} were dedicated on {}",
+                        format_hours_and_minutes(i.1),
+                        i.0.name
+                    );
                 }
             }
             if let Some(last_week) = last_week {

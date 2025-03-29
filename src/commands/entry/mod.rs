@@ -4,8 +4,8 @@ use crate::commands::entry::add::add_time;
 use crate::commands::entry::set::set_time;
 use crate::commands::entry::substract::subtract_time;
 use crate::commands::entry::usage::display_bad_usage;
-use crate::models::Period;
 use crate::commands::subject::get_subject;
+use crate::models::Period;
 use crate::{format_hours_and_minutes, FORMAT};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::SqliteConnection;
@@ -89,5 +89,8 @@ pub fn time_setter(conn: &mut SqliteConnection, args: &mut Vec<String>, mode: En
             set_time(conn, &subject, when, amount);
         }
     }
-    println!("Done! Current dedicated time today: {}", format_hours_and_minutes(subject.total_dedicated_time_day(when, conn)));
+    println!(
+        "Done! Current dedicated time today: {}",
+        format_hours_and_minutes(subject.total_dedicated_time_day(when, conn))
+    );
 }

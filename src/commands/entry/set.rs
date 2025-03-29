@@ -24,8 +24,7 @@ pub fn set_time(conn: &mut SqliteConnection, subject: &Subject, when: NaiveDate,
         )
         .execute(conn)
         {
-            Ok(_) => {
-            }
+            Ok(_) => {}
             Err(e) => {
                 eprintln!("Failed to set entry: {e}");
                 process::exit(1);
@@ -50,8 +49,7 @@ pub fn set_time(conn: &mut SqliteConnection, subject: &Subject, when: NaiveDate,
                         ))
                         .execute(conn)
                     {
-                        Ok(_) => {
-                        }
+                        Ok(_) => {}
                         Err(e) => {
                             eprintln!("Failed to set entry: {e}");
                             process::exit(1);
