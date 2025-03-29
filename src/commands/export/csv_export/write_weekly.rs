@@ -1,7 +1,7 @@
 //! Handles weekly csv export format
 use super::{get_csv_writer, get_header};
 use crate::models::Period;
-use crate::status::WEEKDAY_START;
+use crate::commands::status::WEEKDAY_START;
 use crate::FORMAT;
 use diesel::internal::derives::multiconnection::chrono::{NaiveDate, TimeDelta};
 use diesel::SqliteConnection;
@@ -15,7 +15,7 @@ use std::process;
 /// * `file` - File path to write.
 /// * `period` - Study period.
 /// * `date_interval` - Date interval to search entries.
-pub(super) fn write_weekly(
+pub(crate) fn write_weekly(
     conn: &mut SqliteConnection,
     file: &PathBuf,
     period: &Period,

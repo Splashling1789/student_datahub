@@ -69,7 +69,7 @@ fn get_file_path(path: &str, mode: &ExportMode, descr: String) -> PathBuf {
             descr,
             Local::now()
                 .naive_local()
-                .format(crate::export::csv_export::DATETIME_FILENAME_EXPORT_FORMAT)
+                .format(crate::commands::export::csv_export::DATETIME_FILENAME_EXPORT_FORMAT)
                 .to_string()
         ))
     }

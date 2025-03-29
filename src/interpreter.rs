@@ -3,9 +3,10 @@
 //! the work to command submodules ([plan], [subject], [export]). It also provides
 //! useful functions to every command submodule.
 
-use crate::entry::EntryMode;
-use crate::{debug_println, entry, export, plan, status, subject, usage};
-use std::{process};
+use crate::commands::entry::EntryMode;
+use crate::{debug_println, usage};
+use std::process;
+use crate::commands::{entry, export, plan, status, subject};
 use crate::db_connection_handler::stablish_and_run_migrations;
 
 /// Interprets the first command of the arguments provided and delegates the work to submodule commands

@@ -1,11 +1,11 @@
 //! # Functionality of add, substract and set commands.
 //! This module handles the main data operations for study time registers.
-use crate::entry::add::add_time;
-use crate::entry::set::set_time;
-use crate::entry::substract::subtract_time;
-use crate::entry::usage::display_bad_usage;
+use crate::commands::entry::add::add_time;
+use crate::commands::entry::set::set_time;
+use crate::commands::entry::substract::subtract_time;
+use crate::commands::entry::usage::display_bad_usage;
 use crate::models::Period;
-use crate::subject::get_subject;
+use crate::commands::subject::get_subject;
 use crate::{format_hours_and_minutes, FORMAT};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::SqliteConnection;

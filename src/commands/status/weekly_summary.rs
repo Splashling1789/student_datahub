@@ -8,7 +8,7 @@ use crate::models::Subject;
 /// * `times` - List of (Subject, dedicated time during the week) tuples.
 /// * `last_week` - Total time studied the previous week (if any)
 /// * `average` - Weekly average so far (if any).
-pub(super) fn weekly_summary(
+pub(crate) fn weekly_summary(
     total_time_studied: i32,
     times: &Vec<(Subject, i32)>,
     last_week: Option<i32>,

@@ -1,20 +1,17 @@
-//! Handles daily csv export format
-use crate::export::csv_export::{get_csv_writer, get_header};
+//! Handles monthly csv export format
+use crate::commands::export::csv_export::{get_csv_writer, get_header, MONTHLY_FORMAT};
 use crate::models::Period;
-use crate::FORMAT;
-use diesel::internal::derives::multiconnection::chrono::{NaiveDate, TimeDelta};
+use diesel::internal::derives::multiconnection::chrono::{Datelike, NaiveDate};
 use diesel::SqliteConnection;
-use std::ops::Add;
 use std::path::PathBuf;
 use std::process;
-
-/// Writes the period study time data by days.
+/// Writes the period study time data by months.
 /// # Arguments
 /// * `conn` - Database connection.
 /// * `file` - File path to write.
 /// * `period` - Study period.
 /// * `date_interval` - Date interval to search entries.
-pub(super) fn write_daily(
+pub(crate) fn write_monthly(
     conn: &mut SqliteConnection,
     file: &PathBuf,
     period: &Period,
@@ -31,10 +28,20 @@ pub(super) fn write_daily(
     }
     let mut i = *date_interval.0;
     while i.le(date_interval.1) {
+        let interval_to_fetch = (
+            NaiveDate::from_ymd_opt(i.year(), i.month(), 1).unwrap(),
+            NaiveDate::from_ymd_opt(i.year(), i.month() + 1, 1)
+                .unwrap()
+                .pred_opt()
+                .unwrap(),
+        );
         let mut record: Vec<String> = Vec::new();
-        record.push(i.format(FORMAT).to_string());
+        record.push(format!("{}", i.format(MONTHLY_FORMAT)));
         for j in &subjects {
-            record.push(j.total_dedicated_time_day(i, conn).to_string());
+            record.push(
+                j.total_dedicated_time_interval(conn, interval_to_fetch)
+                    .to_string(),
+            );
         }
         match writer.write_record(record) {
             Ok(_) => {}
@@ -43,6 +50,8 @@ pub(super) fn write_daily(
                 process::exit(1);
             }
         }
-        i = i.add(TimeDelta::days(1));
+        i = i
+            .with_month(std::cmp::max((i.month() + 1) % 13, 1))
+            .unwrap();
     }
 }

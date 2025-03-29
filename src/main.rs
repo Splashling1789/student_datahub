@@ -2,16 +2,12 @@
 //! This command-line tool lets you register the time dedicated to all your subjects of different
 //! periods (semesters or similar) in a single command. It stores the data in an SQLite database,
 //! and there are commands to export it to csv format for later data analysis.
-mod entry;
-mod export;
 mod interpreter;
 mod models;
-mod plan;
 mod schema;
-mod status;
-mod subject;
 mod usage;
 mod db_connection_handler;
+mod commands;
 
 use std::{env, fs};
 use std::path::Path;
