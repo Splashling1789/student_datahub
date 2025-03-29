@@ -2,8 +2,7 @@
 //! The status command's prompt is divided in three parts:
 //! * **Period details**: Prints the date and description of the period.
 //! * **Daily summary**: Prints a daily summary, with the total time the user studied, and the time dedicated to every subject.
-//! * **Weekly summary**: Prints a weekly summary (if the previous week is included in the plan's period), with how much more did
-//! the user study regards the previous week, and whether they are doing better in their average.
+//! * **Weekly summary**: Prints a weekly summary (if the previous week is included in the plan's period), with how much more did the user study regards the previous week, and whether they are doing better in their average.
 
 mod daily_summary;
 mod period_details;
@@ -17,7 +16,6 @@ use crate::status::weekly_summary::weekly_summary;
 use crate::FORMAT;
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, Weekday};
 use diesel::SqliteConnection;
-use std::ops::Add;
 use std::process;
 use terminal_size::{terminal_size, Width};
 
@@ -44,7 +42,7 @@ pub fn display_status(conn: &mut SqliteConnection, args: &mut Vec<String>) {
     let period = Period::from_id(conn, plan_id).unwrap();
     let date = match args.is_empty() {
         true => Local::now().naive_local().date(),
-        false => match NaiveDate::parse_from_str(args.get(0).unwrap(), FORMAT) {
+        false => match NaiveDate::parse_from_str(args.first().unwrap(), FORMAT) {
             Ok(date) => date,
             Err(e) => {
                 eprintln!("Error parsing date: {e}");

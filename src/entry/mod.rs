@@ -21,9 +21,9 @@ mod usage;
 /// * `SUBSTRACT` - To substract time.
 /// * `SET` - To set time, overriding any previous entry.
 pub enum EntryMode {
-    ADD,
-    SUBSTRACT,
-    SET,
+    Add,
+    Substract,
+    Set,
 }
 
 /// Alters or adds an entry of study time.
@@ -33,7 +33,7 @@ pub enum EntryMode {
 /// * `mode` - Entry altering mode.
 pub fn time_setter(conn: &mut SqliteConnection, args: &mut Vec<String>, mode: EntryMode) {
     let when: NaiveDate = match args.len() {
-        3 => match NaiveDate::parse_from_str(&*args.get(0).unwrap().clone(), FORMAT) {
+        3 => match NaiveDate::parse_from_str(&args.first().unwrap().clone(), FORMAT) {
             Ok(when) => {
                 args.remove(0);
                 when
@@ -56,7 +56,7 @@ pub fn time_setter(conn: &mut SqliteConnection, args: &mut Vec<String>, mode: En
             process::exit(1);
         }
     };
-    let subject = match get_subject(args.get(0).unwrap(), conn, Some(plan_id)) {
+    let subject = match get_subject(args.first().unwrap(), conn, Some(plan_id)) {
         Some(subject) => subject,
         None => {
             eprintln!("There is no subject with that id or short name");
@@ -79,13 +79,13 @@ pub fn time_setter(conn: &mut SqliteConnection, args: &mut Vec<String>, mode: En
     };
 
     match mode {
-        EntryMode::ADD => {
+        EntryMode::Add => {
             add_time(conn, &subject, when, amount);
         }
-        EntryMode::SUBSTRACT => {
+        EntryMode::Substract => {
             subtract_time(conn, &subject, when, amount);
         }
-        EntryMode::SET => {
+        EntryMode::Set => {
             set_time(conn, &subject, when, amount);
         }
     }

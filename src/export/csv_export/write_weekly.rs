@@ -30,15 +30,15 @@ pub(super) fn write_weekly(
             process::exit(1);
         }
     }
-    let mut i = date_interval.0.clone();
-    while i.le(&date_interval.1) {
+    let mut i = *date_interval.0;
+    while i.le(date_interval.1) {
         let interval_to_fetch = (
             i.week(WEEKDAY_START)
                 .first_day()
-                .max(date_interval.0.clone()),
+                .max(*date_interval.0),
             i.week(WEEKDAY_START)
                 .last_day()
-                .min(date_interval.1.clone()),
+                .min(*date_interval.1),
         );
         let mut record: Vec<String> = Vec::new();
         record.push(format!(

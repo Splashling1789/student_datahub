@@ -26,8 +26,8 @@ pub(super) fn write_monthly(
             process::exit(1);
         }
     }
-    let mut i = date_interval.0.clone();
-    while i.le(&date_interval.1) {
+    let mut i = *date_interval.0;
+    while i.le(date_interval.1) {
         let interval_to_fetch = (
             NaiveDate::from_ymd_opt(i.year(), i.month(), 1).unwrap(),
             NaiveDate::from_ymd_opt(i.year(), i.month() + 1, 1)

@@ -1,4 +1,4 @@
-///! Handles subject adding.
+//! Handles subject adding.
 use crate::models::Subject;
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::{name, period_id, short_name};

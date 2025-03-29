@@ -12,22 +12,22 @@ mod csv_export;
 mod usage;
 
 /// Enum for different export modes.
-/// * `DAILY`: Export study time day by day.
-/// * `WEEKLY`: Export study time week by week.
-/// * `MONTHLY`: Export study time month by month.
 enum ExportMode {
-    DAILY,
-    WEEKLY,
-    MONTHLY,
+    /// Export study time day by day.
+    Daily,
+    /// Export study time week by week.
+    Weekly,
+    /// Export study time month by month.
+    Monthly,
 }
 
 impl ExportMode {
     /// Gets the export mode name in lowercase.
     fn to_string(&self) -> String {
         match self {
-            ExportMode::DAILY => String::from("daily"),
-            ExportMode::WEEKLY => String::from("weekly"),
-            ExportMode::MONTHLY => String::from("monthly"),
+            ExportMode::Daily => String::from("daily"),
+            ExportMode::Weekly => String::from("weekly"),
+            ExportMode::Monthly => String::from("monthly"),
         }
     }
 }
@@ -38,7 +38,7 @@ impl ExportMode {
 /// * `conn` : Database connection.
 pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
     let plan_id = get_plan_arg(args, conn);
-    if args.is_empty() || args.get(0).unwrap().starts_with("--") {
+    if args.is_empty() || args.first().unwrap().starts_with("--") {
         display_bad_usage();
         process::exit(1);
     }
@@ -63,49 +63,49 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
         let column = i.short_name.clone();
         header.push(column);
     }
-    match args.get(0).unwrap().trim() {
+    match args.first().unwrap().trim() {
         "daily" => csv_export(
             conn,
             &period,
             (&start_date, &end_date),
-            &*get_data_dir(),
-            ExportMode::DAILY,
+            &get_data_dir(),
+            ExportMode::Daily,
         ),
         "weekly" => csv_export(
             conn,
             &period,
             (&start_date, &end_date),
-            &*get_data_dir(),
-            ExportMode::WEEKLY,
+            &get_data_dir(),
+            ExportMode::Weekly,
         ),
         "monthly" => csv_export(
             conn,
             &period,
             (&start_date, &end_date),
-            &*get_data_dir(),
-            ExportMode::MONTHLY,
+            &get_data_dir(),
+            ExportMode::Monthly,
         ),
         "all" => {
             csv_export(
                 conn,
                 &period,
                 (&start_date, &end_date),
-                &*get_data_dir(),
-                ExportMode::DAILY,
+                &get_data_dir(),
+                ExportMode::Daily,
             );
             csv_export(
                 conn,
                 &period,
                 (&start_date, &end_date),
-                &*get_data_dir(),
-                ExportMode::WEEKLY,
+                &get_data_dir(),
+                ExportMode::Weekly,
             );
             csv_export(
                 conn,
                 &period,
                 (&start_date, &end_date),
-                &*get_data_dir(),
-                ExportMode::MONTHLY,
+                &get_data_dir(),
+                ExportMode::Monthly,
             );
         }
         _ => {

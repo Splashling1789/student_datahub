@@ -10,7 +10,7 @@ pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 /// It returns the connection path as a String.
 fn get_connection_string() -> String {
     if cfg!(debug_assertions) {
-        format!("{}", env::var("DATABASE_URL").expect("Failed to get DATABASE_URL from .env file"))
+        env::var("DATABASE_URL").expect("Failed to get DATABASE_URL from .env file").to_string()
     }
     else {
         format!("{}{}",

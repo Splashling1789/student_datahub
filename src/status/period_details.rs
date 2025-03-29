@@ -12,19 +12,17 @@ pub fn print_period_details(period: &Period, date: &NaiveDate) {
     if *date == period.initial_date {
         print!("{}", date.format(FORMAT).to_string().green())
     } else {
-        print!("{}", period.initial_date.format(FORMAT).to_string());
+        print!("{}", period.initial_date.format(FORMAT));
     }
 
-    if (*date - period.initial_date).num_days() == 1 {
-        print!(" - {}", date.format(FORMAT).to_string().green());
-    } else if (*date - period.initial_date).num_days() > 1 {
-        print!(" - ... - {}", date.format(FORMAT).to_string().green());
+    match (*date - period.initial_date).num_days()  {
+        1 => print!(" - {}", date.format(FORMAT).to_string().green()),
+        _ => print!(" - ... - {}", date.format(FORMAT).to_string().green())
     }
-
-    if (period.final_date - *date).num_days() == 1 {
-        print!(" - {}", period.final_date.format(FORMAT).to_string());
-    } else if (period.final_date - *date).num_days() > 1 {
-        print!(" - ... - {}", period.final_date.format(FORMAT).to_string());
+    
+    match (period.final_date - *date).num_days() {
+        1 => print!(" - {}", period.final_date.format(FORMAT)),
+        _ => print!(" - ... - {}", period.final_date.format(FORMAT))
     }
     println!();
 }

@@ -46,8 +46,7 @@ pub fn get_subject(
                     if s.len() > 1 && plan_id.is_some() {
                         debug_println!("There is more than one subject with same short name.");
                         s.iter()
-                            .filter(|s| s.period_id == plan_id.unwrap())
-                            .next()
+                            .find(|s| s.period_id == plan_id.unwrap())
                             .cloned()
                     } else {
                         s.first().cloned()
@@ -71,10 +70,10 @@ pub fn get_subject(
 /// * `args` - Remaining program arguments.
 /// * `conn` - Database connection.
 pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
-    if args.len() == 0 {
+    if args.is_empty() {
         display_bad_usage()
     } else {
-        let option = args.get(0).cloned().unwrap();
+        let option = args.first().cloned().unwrap();
         args.remove(0);
         let plan_id = get_plan_arg(args, conn);
         match option.trim() {
@@ -84,7 +83,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                     process::exit(1);
                 }
                 let (new_short_name, new_name) =
-                    (args.get(0).unwrap().clone(), args.get(1).unwrap().clone());
+                    (args.first().unwrap().clone(), args.get(1).unwrap().clone());
                 if new_short_name.parse::<i32>().is_ok() {
                     eprintln!("Short name can't be a number");
                     process::exit(1);
@@ -92,7 +91,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                 add::add(conn, plan_id, new_short_name, new_name);
             }
             "modify" => {
-                if args.len() < 1 {
+                if args.is_empty() {
                     display_bad_usage();
                     process::exit(1);
                 }
@@ -101,7 +100,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                     display_bad_usage();
                     process::exit(1);
                 }
-                let subj = match get_subject(args.get(0).unwrap(), conn, Some(plan_id)) {
+                let subj = match get_subject(args.first().unwrap(), conn, Some(plan_id)) {
                     Some(subj) => subj,
                     None => {
                         eprintln!("Failed to get subject. Does this subject exist?");
@@ -119,11 +118,11 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                 modify::modify(conn, subj, new_short_name, new_name);
             }
             "remove" => {
-                if args.len() < 1 {
+                if args.is_empty() {
                     display_bad_usage();
                     process::exit(1);
                 }
-                match get_subject(args.get(0).unwrap(), conn, Some(plan_id)) {
+                match get_subject(args.first().unwrap(), conn, Some(plan_id)) {
                     Some(subj) => {
                         if !args.contains(&"--confirm".to_string()) {
                             println!("{}", subj.to_string());
@@ -147,7 +146,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                     display_bad_usage();
                     process::exit(1);
                 }
-                let subject = match get_subject(args.get(0).unwrap(), conn, Some(plan_id)) {
+                let subject = match get_subject(args.first().unwrap(), conn, Some(plan_id)) {
                     Some(subj) => subj,
                     None => {
                         eprintln!("Failed to get subject. Does this subject exist?");

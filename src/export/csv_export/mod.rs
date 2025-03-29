@@ -50,25 +50,29 @@ fn get_csv_writer(path: &PathBuf) -> Writer<File> {
 
 /// Gets the csv file path based on a folder path, export mode and description. It will be formatted as `"{path}{ExportMode}_{description}\_{now_datetime}"`
 fn get_file_path(path: &str, mode: &ExportMode, descr: String) -> PathBuf {
-    return PathBuf::from(format!(
-        "{path}{}_{}_{}.csv",
-        Local::now()
-            .naive_local()
-            .format(DATETIME_FILENAME_EXPORT_FORMAT)
-            .to_string(),
-        descr,
-        mode.to_string(),
-    ));
+    #[cfg(not(target_os = "windows"))]
+    {
+        PathBuf::from(format!(
+            "{path}{}_{}_{}.csv",
+            Local::now()
+                .naive_local()
+                .format(DATETIME_FILENAME_EXPORT_FORMAT),
+            descr,
+            mode.to_string(),
+        ))
+    }
     #[cfg(target_os = "windows")]
-    return PathBuf::from(format!(
-        "{path}{}_{}_{}.csv",
-        mode.to_string(),
-        descr,
-        Local::now()
-            .naive_local()
-            .format(DATETIME_FILENAME_EXPORT_FORMAT)
-            .to_string()
-    ));
+    {
+        PathBuf::from(format!(
+            "{path}{}_{}_{}.csv",
+            mode.to_string(),
+            descr,
+            Local::now()
+                .naive_local()
+                .format(crate::export::csv_export::DATETIME_FILENAME_EXPORT_FORMAT)
+                .to_string()
+        ))
+    }
 }
 
 /// It exports all the data from a period in a specific interval and export mode to a file in the given path.
@@ -89,13 +93,13 @@ pub fn csv_export(
     descr.truncate(10);
     let path = get_file_path(program_path, &mode, descr);
     match mode {
-        ExportMode::DAILY => {
+        ExportMode::Daily => {
             write_daily(conn, &path, period, date_interval);
         }
-        ExportMode::WEEKLY => {
+        ExportMode::Weekly => {
             write_weekly(conn, &path, period, date_interval);
         }
-        ExportMode::MONTHLY => {
+        ExportMode::Monthly => {
             write_monthly(conn, &path, period, date_interval);
         }
     }

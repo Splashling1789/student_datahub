@@ -18,7 +18,7 @@ pub fn interpret(args: &mut Vec<String>) {
             process::exit(0);
         }
         _ => {
-            let option = args.get(0).unwrap().clone();
+            let option = args.first().unwrap().clone();
             args.remove(0);
             debug_println!("using arg: {option}");
             let mut conn = stablish_and_run_migrations();
@@ -26,9 +26,9 @@ pub fn interpret(args: &mut Vec<String>) {
                 "status" => status::display_status(&mut conn, args),
                 "plan" => plan::interpret(args, &mut conn),
                 "subject" => subject::interpret(args, &mut conn),
-                "add" => entry::time_setter(&mut conn, args, EntryMode::ADD),
-                "substract" => entry::time_setter(&mut conn, args, EntryMode::SUBSTRACT),
-                "set" => entry::time_setter(&mut conn, args, EntryMode::SET),
+                "add" => entry::time_setter(&mut conn, args, EntryMode::Add),
+                "substract" => entry::time_setter(&mut conn, args, EntryMode::Substract),
+                "set" => entry::time_setter(&mut conn, args, EntryMode::Set),
                 "export" => export::interpret(args, &mut conn),
                 _ => {}
             }
@@ -40,7 +40,7 @@ pub fn interpret(args: &mut Vec<String>) {
 /// # Arguments
 /// * `args` - program arguments
 /// * `find` - argument flag to find
-pub fn get_specific_arg(args: &mut Vec<String>, find: &str) -> Option<String> {
+pub fn get_specific_arg(args: &mut [String], find: &str) -> Option<String> {
     match args.iter().enumerate().find(|a| a.1 == find) {
         Some(i) => args.get(i.0 + 1).cloned(),
         None => None,

@@ -29,8 +29,8 @@ pub(super) fn write_daily(
             process::exit(1);
         }
     }
-    let mut i = date_interval.0.clone();
-    while i.le(&date_interval.1) {
+    let mut i = *date_interval.0;
+    while i.le(date_interval.1) {
         let mut record: Vec<String> = Vec::new();
         record.push(i.format(FORMAT).to_string());
         for j in &subjects {

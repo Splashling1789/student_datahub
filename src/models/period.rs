@@ -1,39 +1,34 @@
-use std::ops::Add;
 use crate::models::{Period, Subject};
 use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::period_id;
 use crate::{debug_println, FORMAT};
-use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, TimeDelta};
+use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::ExpressionMethods;
 use diesel::QueryDsl;
 use diesel::{RunQueryDsl, SqliteConnection};
 use std::process;
-use diesel::dsl::{avg, sql};
-use crate::schema::entry::{date, dedicated_time};
+use diesel::dsl::{sql};
+use crate::schema::entry::{date};
 use crate::schema::entry::dsl::entry;
-use crate::status::WEEKDAY_START;
 
 impl Period {
     /// Gets a formatted string with relevant data of the period.
     pub fn to_string(&self) -> String {
         format!(
             "{} - {}\t{} (ID:{})",
-            self.initial_date.format(FORMAT).to_string(),
-            self.final_date.format(FORMAT).to_string(),
-            self.description.to_string(),
+            self.initial_date.format(FORMAT),
+            self.final_date.format(FORMAT),
+            self.description,
             self.id
         )
     }
     /// It determines if the period is actual (It is ocurring now)
     pub fn is_actual(&self) -> bool {
         let now = Local::now().date_naive();
-        if now >= self.initial_date && now <= self.final_date {
-            true
-        } else {
-            false
-        }
+        
+        now >= self.initial_date && now <= self.final_date
     }
     /// It fetches all study periods.
     /// # Arguments

@@ -49,7 +49,7 @@ pub fn get_plan_arg(args: &mut Vec<String>, conn: &mut SqliteConnection) -> i32 
     }
 }
 
-pub fn get_date_arg(args: &mut Vec<String>, find: &str) -> NaiveDate {
+pub fn get_date_arg(args: &mut [String], find: &str) -> NaiveDate {
     match get_specific_arg(args, find) {
         Some(start_date) => match NaiveDate::parse_from_str(&start_date, FORMAT) {
             Ok(date) => date,
@@ -67,11 +67,11 @@ pub fn get_date_arg(args: &mut Vec<String>, find: &str) -> NaiveDate {
 }
 
 pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
-    if args.len() == 0 {
+    if args.is_empty() {
         display_bad_usage();
         process::exit(1);
     } else {
-        let option = args.get(0).cloned().unwrap();
+        let option = args.first().cloned().unwrap();
         args.remove(0);
         match option.trim() {
             "list" => {
@@ -139,7 +139,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                     process::exit(1);
                 }
 
-                let period = match args.get(0) {
+                let period = match args.first() {
                     Some(s) => match s.trim() {
                         "--confirm" => match Period::get_actual_period(conn) {
                             Some(p) => p,

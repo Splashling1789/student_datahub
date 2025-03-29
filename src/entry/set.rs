@@ -57,7 +57,6 @@ pub fn set_time(conn: &mut SqliteConnection, subject: &Subject, when: NaiveDate,
                             process::exit(1);
                         }
                     }
-                } else {
                 }
             }
             Err(e) => {

@@ -11,8 +11,7 @@ use crate::format_hours_and_minutes;
 pub fn list(conn: &mut SqliteConnection, plan_id: i32) {
     let plan = match Period::fetch_all_plans(conn)
         .iter()
-        .filter(|p| p.id == plan_id)
-        .nth(0)
+        .find(|p| p.id == plan_id)
     {
         Some(plan) => plan.clone(),
         None => {
@@ -23,8 +22,8 @@ pub fn list(conn: &mut SqliteConnection, plan_id: i32) {
     println!(
         "Subjects from period {} ({} - {})",
         plan.description,
-        plan.initial_date.to_string(),
-        plan.final_date.to_string()
+        plan.initial_date,
+        plan.final_date
     );
     let subjects_from_plan = Subject::fetch_all(conn)
         .iter()
