@@ -15,10 +15,10 @@ pub(super) fn weekly_summary(
     average: Option<f64>,
 ) {
     if total_time_studied > 0 {
-        println!("\tThis week you have studied {} minutes:", format_hours_and_minutes(total_time_studied));
+        println!("\tThis week you have studied {}:", format_hours_and_minutes(total_time_studied));
         for i in times {
             if i.1 != 0 {
-                println!("\t * {} minutes were dedicated on {}", format_hours_and_minutes(i.1), i.0.name);
+                println!("\t * {} were dedicated on {}", format_hours_and_minutes(i.1), i.0.name);
             }
         }
         if let Some(last_week) = last_week {
