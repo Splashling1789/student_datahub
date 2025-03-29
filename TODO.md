@@ -12,7 +12,7 @@
  - [x] subject module reorganized
  - [x] database connection handler module
  - [ ] avoid redundant code repetition
- - [ ] docs
+ - [x] docs
  - [ ] better queries
 
 ## Optional code cleaning
