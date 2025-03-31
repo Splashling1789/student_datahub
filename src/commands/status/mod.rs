@@ -14,7 +14,7 @@ use crate::commands::status::period_details::print_period_details;
 use crate::commands::status::weekly_summary::weekly_summary;
 use crate::models::{Period, Subject};
 use crate::FORMAT;
-use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, Weekday};
+use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, TimeDelta, Weekday};
 use diesel::SqliteConnection;
 use std::process;
 use terminal_size::{terminal_size, Width};
@@ -85,7 +85,7 @@ pub fn display_status(conn: &mut SqliteConnection, args: &mut Vec<String>) {
                 total += i.total_dedicated_time_interval(conn, previous_interval);
             }
             total_previous_time = Some(total);
-            last_week_final_day = Some(interval.1);
+            last_week_final_day = Some(previous_interval.1);
         } else {
             total_previous_time = None;
             last_week_final_day = None;
@@ -100,7 +100,10 @@ pub fn display_status(conn: &mut SqliteConnection, args: &mut Vec<String>) {
             &times,
             total_previous_time,
             match last_week_final_day {
-                Some(d) => Some(period.weekly_average_until(conn, period.initial_date, d)),
+                Some(d) => {
+                    if (d + TimeDelta::days(1)).week(WEEKDAY_START) == date.week(WEEKDAY_START) {None}
+                    else {Some(period.weekly_average_until(conn, period.initial_date, d))}
+                }
                 None => None,
             },
         )
