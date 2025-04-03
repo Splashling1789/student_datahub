@@ -10,7 +10,7 @@ keywords = ["college", "student", "study", "highschool"]
 categories = ["command-line-utilities", "data-structures"]
 
 [dependencies]
-diesel = {version = "2.2.7", features = ["sqlite", "returning_clauses_for_sqlite_3_35", "chrono"]}
+diesel = {version = "2.2.8", features = ["sqlite", "returning_clauses_for_sqlite_3_35", "chrono"]}
 diesel_migrations = "2.2.0"
 dotenv = "0.15.0"
 colored = "3.0.0"
