@@ -13,8 +13,8 @@ use crate::commands::status::daily_summary::daily_summary;
 use crate::commands::status::period_details::print_period_details;
 use crate::commands::status::weekly_summary::weekly_summary;
 use crate::models::{Period, Subject};
-use crate::FORMAT;
-use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, TimeDelta, Weekday};
+use crate::{debug_println, FORMAT};
+use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, NaiveWeek, TimeDelta, Weekday};
 use diesel::SqliteConnection;
 use std::process;
 use terminal_size::{terminal_size, Width};
@@ -95,13 +95,15 @@ pub fn display_status(conn: &mut SqliteConnection, args: &mut Vec<String>) {
             times.push((i, time));
         }
         let total_time_studied = times.iter().map(|(_, t)| t).sum::<i32>();
+        debug_println!("last_week: {:?}. Actual date: {date}", last_week_final_day);
         weekly_summary(
             total_time_studied,
             &times,
             total_previous_time,
             match last_week_final_day {
                 Some(d) => {
-                    if (d + TimeDelta::days(1)).week(WEEKDAY_START) == date.week(WEEKDAY_START) {None}
+                    debug_println!("{:?}, {:?}", (d+TimeDelta::weeks(1)).week(WEEKDAY_START), date.week(WEEKDAY_START));
+                    if ((d + TimeDelta::weeks(1)).week(WEEKDAY_START)).first_day() == (date.week(WEEKDAY_START)).first_day() {None}
                     else {Some(period.weekly_average_until(conn, period.initial_date, d))}
                 }
                 None => None,
