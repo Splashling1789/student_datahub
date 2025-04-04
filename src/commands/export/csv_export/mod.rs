@@ -58,7 +58,7 @@ fn get_file_path(path: &str, mode: &ExportMode, descr: String) -> PathBuf {
                 .naive_local()
                 .format(DATETIME_FILENAME_EXPORT_FORMAT),
             descr,
-            mode.to_string(),
+            mode,
         ))
     }
     #[cfg(target_os = "windows")]

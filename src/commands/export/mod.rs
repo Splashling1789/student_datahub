@@ -1,5 +1,7 @@
 //! # Functionallity of the export command
 //! This module handles the export of student data from the datahub into formats such as CSV.
+
+use std::fmt::{Display, Formatter};
 use crate::commands::export::usage::display_bad_usage;
 use crate::commands::plan::{get_date_arg, get_plan_arg};
 use crate::get_data_dir;
@@ -21,14 +23,13 @@ enum ExportMode {
     Monthly,
 }
 
-impl ExportMode {
-    /// Gets the export mode name in lowercase.
-    fn to_string(&self) -> String {
-        match self {
-            ExportMode::Daily => String::from("daily"),
-            ExportMode::Weekly => String::from("weekly"),
-            ExportMode::Monthly => String::from("monthly"),
-        }
+impl Display for ExportMode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+            match self {
+                ExportMode::Daily => f.write_str("daily"),
+                ExportMode::Weekly => f.write_str("weekly"),
+                ExportMode::Monthly => f.write_str("monthly"),
+            }
     }
 }
 
