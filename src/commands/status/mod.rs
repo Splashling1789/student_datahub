@@ -14,7 +14,7 @@ use crate::commands::status::period_details::print_period_details;
 use crate::commands::status::weekly_summary::weekly_summary;
 use crate::models::{Period, Subject};
 use crate::{debug_println, FORMAT};
-use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, NaiveWeek, TimeDelta, Weekday};
+use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, TimeDelta, Weekday};
 use diesel::SqliteConnection;
 use std::process;
 use terminal_size::{terminal_size, Width};
