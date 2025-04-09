@@ -64,14 +64,14 @@ pub fn display_status(conn: &mut SqliteConnection, args: &mut Vec<String>) {
     }
     print_separator();
     {
-        let week = date.week(WEEKDAY_START);
-        let interval = (
-            week.first_day().max(period.initial_date),
-            week.last_day().min(period.final_date),
+        let now_week = date.week(WEEKDAY_START);
+        let now_week_interval = (
+            now_week.first_day().max(period.initial_date),
+            now_week.last_day().min(period.final_date),
         );
         let mut times: Vec<(Subject, i32)> = Vec::new();
         let subject_list = period.fetch_subjects(conn);
-        let previous_day = week.first_day().pred_opt().unwrap();
+        let previous_day = now_week.first_day().pred_opt().unwrap();
         let total_previous_time: Option<i32>;
         let last_week_final_day: Option<NaiveDate>;
         if previous_day > period.initial_date {
@@ -91,7 +91,7 @@ pub fn display_status(conn: &mut SqliteConnection, args: &mut Vec<String>) {
             last_week_final_day = None;
         }
         for i in subject_list {
-            let time = i.total_dedicated_time_interval(conn, interval);
+            let time = i.total_dedicated_time_interval(conn, now_week_interval);
             times.push((i, time));
         }
         let total_time_studied = times.iter().map(|(_, t)| t).sum::<i32>();
@@ -102,9 +102,25 @@ pub fn display_status(conn: &mut SqliteConnection, args: &mut Vec<String>) {
             total_previous_time,
             match last_week_final_day {
                 Some(d) => {
-                    debug_println!("{:?}, {:?}", (d+TimeDelta::weeks(1)).week(WEEKDAY_START), date.week(WEEKDAY_START));
-                    if ((d + TimeDelta::weeks(1)).week(WEEKDAY_START)).first_day() == (date.week(WEEKDAY_START)).first_day() {None}
-                    else {Some(period.weekly_average_until(conn, period.initial_date, d))}
+                    debug_println!(
+                        "{:?}, {:?}",
+                        (d).week(WEEKDAY_START),
+                        period.initial_date.week(WEEKDAY_START)
+                    );
+                    debug_println!(
+                        "{:?}, {:?}",
+                        (period.initial_date + TimeDelta::weeks(1))
+                            .week(WEEKDAY_START)
+                            .first_day(),
+                        d.week(WEEKDAY_START).first_day()
+                    );
+                    if ((period.initial_date + TimeDelta::weeks(1)).week(WEEKDAY_START)).first_day()
+                        > (d.week(WEEKDAY_START)).first_day()
+                    {
+                        None
+                    } else {
+                        Some(period.weekly_average_until(conn, period.initial_date, d))
+                    }
                 }
                 None => None,
             },
