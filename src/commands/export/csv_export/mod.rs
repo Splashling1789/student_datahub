@@ -13,7 +13,7 @@ use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::SqliteConnection;
 use std::fs::File;
 use std::path::PathBuf;
-use std::process;
+use std::{fs, process};
 use write_daily::write_daily;
 use write_monthly::write_monthly;
 use write_weekly::write_weekly;
@@ -39,6 +39,15 @@ fn get_header(subjects: &Vec<Subject>) -> Vec<String> {
 /// # Arguments
 /// * `path` - File path.
 fn get_csv_writer(path: &PathBuf) -> Writer<File> {
+    if !path.exists() {
+        match fs::create_dir_all(&path.parent().unwrap()) {
+            Ok(_) => (),
+            Err(e) => {
+                eprintln!("Failed to create directory when exporting: {e}");
+                process::exit(1);
+            }
+        }
+    }
     match csv::Writer::from_path(path) {
         Ok(w) => w,
         Err(e) => {
@@ -53,7 +62,7 @@ fn get_file_path(path: &str, mode: &ExportMode, descr: String) -> PathBuf {
     #[cfg(not(target_os = "windows"))]
     {
         PathBuf::from(format!(
-            "{path}{}_{}_{}.csv",
+            "{path}/{}_{}/{}.csv",
             Local::now()
                 .naive_local()
                 .format(DATETIME_FILENAME_EXPORT_FORMAT),
@@ -64,13 +73,12 @@ fn get_file_path(path: &str, mode: &ExportMode, descr: String) -> PathBuf {
     #[cfg(target_os = "windows")]
     {
         PathBuf::from(format!(
-            "{path}{}_{}_{}.csv",
-            mode.to_string(),
-            descr,
+            "{path}/{}_{}/{}.csv",
             Local::now()
                 .naive_local()
-                .format(crate::commands::export::csv_export::DATETIME_FILENAME_EXPORT_FORMAT)
-                .to_string()
+                .format(DATETIME_FILENAME_EXPORT_FORMAT),
+            descr,
+            mode.to_string()
         ))
     }
 }
