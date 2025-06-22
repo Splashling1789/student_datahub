@@ -25,6 +25,10 @@ pub fn interpret(args: &mut Vec<String>) {
             debug_println!("using arg: {option}");
             let mut conn = stablish_and_run_migrations();
             match option.trim() {
+                "setup" => {
+                    println!("Environment set up");
+                    process::exit(0);
+                }
                 "status" => status::display_status(&mut conn, args),
                 "plan" => plan::interpret(args, &mut conn),
                 "subject" => subject::interpret(args, &mut conn),

@@ -8,6 +8,7 @@ mod interpreter;
 mod models;
 mod schema;
 mod usage;
+pub mod tests;
 
 use std::path::Path;
 use std::{env, fs};

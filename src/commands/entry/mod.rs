@@ -5,7 +5,7 @@ use crate::commands::entry::set::set_time;
 use crate::commands::entry::substract::subtract_time;
 use crate::commands::entry::usage::display_bad_usage;
 use crate::commands::subject::get_subject;
-use crate::format_hours_and_minutes;
+use crate::{format_hours_and_minutes};
 use crate::interpreter::parse_date;
 use crate::models::Period;
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
@@ -16,6 +16,7 @@ mod add;
 mod set;
 mod substract;
 mod usage;
+mod unit_test;
 
 /// Mode of entry adding
 /// * `ADD` - To add time.
@@ -69,7 +70,6 @@ pub fn time_setter(conn: &mut SqliteConnection, args: &mut [String], mode: Entry
             process::exit(1);
         }
     };
-
     match mode {
         EntryMode::Add => {
             add_time(conn, &subject, when, amount);
