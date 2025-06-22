@@ -6,8 +6,9 @@
 use crate::commands::entry::EntryMode;
 use crate::commands::{entry, export, plan, status, subject};
 use crate::db_connection_handler::stablish_and_run_migrations;
-use crate::{debug_println, usage};
+use crate::{debug_println, usage, FORMAT};
 use std::process;
+use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 
 /// Interprets the first command of the arguments provided and delegates the work to submodule commands
 /// # Arguments
@@ -86,4 +87,22 @@ pub fn detect_unknown_arg(args: &Vec<String>, options: &Vec<&str>, prefix: &str)
         }
     }
     None
+}
+
+pub fn parse_date(date : &str) -> NaiveDate {
+    match NaiveDate::parse_from_str(date, FORMAT) {
+        Ok(d) => d,
+        Err(e) => {
+            match date.to_lowercase().trim() {
+                "@yest" | "@yesterday" => {
+                    Local::now().naive_local().date().pred_opt().expect("Unexpected date provided")
+                }
+                _ => {
+                    eprintln!("Failed to parse date. Remember using format '{}'", FORMAT);
+                    debug_println!("{e}");
+                    process::exit(1);
+                }
+            }
+        }
+    }
 }

@@ -7,12 +7,14 @@ mod start;
 mod usage;
 
 use crate::commands::plan::usage::display_bad_usage;
-use crate::interpreter::{get_specific_arg, request_confirmation};
+use crate::interpreter::{get_specific_arg, parse_date, request_confirmation};
 use crate::models::Period;
 use crate::{debug_println, FORMAT};
-use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
+use diesel::internal::derives::multiconnection::chrono::{Datelike, Local, NaiveDate};
 use diesel::SqliteConnection;
 use std::process;
+use diesel::internal::derives::multiconnection::chrono;
+use crate::commands::status::WEEKDAY_START;
 
 pub fn get_plan_arg(args: &mut Vec<String>, conn: &mut SqliteConnection) -> i32 {
     match get_specific_arg(args, "--plan") {
@@ -51,14 +53,7 @@ pub fn get_plan_arg(args: &mut Vec<String>, conn: &mut SqliteConnection) -> i32 
 
 pub fn get_date_arg(args: &mut [String], find: &str) -> NaiveDate {
     match get_specific_arg(args, find) {
-        Some(start_date) => match NaiveDate::parse_from_str(&start_date, FORMAT) {
-            Ok(date) => date,
-            Err(e) => {
-                eprintln!("Failed to parse date. Remember using format '{}'", FORMAT);
-                debug_println!("{e}");
-                process::exit(1);
-            }
-        },
+        Some(start_date) => parse_date(start_date.trim()),
         None => {
             display_bad_usage();
             process::exit(1);

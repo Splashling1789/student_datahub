@@ -18,6 +18,7 @@ use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, TimeD
 use diesel::SqliteConnection;
 use std::process;
 use terminal_size::{terminal_size, Width};
+use crate::interpreter::parse_date;
 
 /// Day considered the first of the week.
 pub const WEEKDAY_START: Weekday = Weekday::Mon;
@@ -42,13 +43,7 @@ pub fn display_status(conn: &mut SqliteConnection, args: &mut Vec<String>) {
     let period = Period::from_id(conn, plan_id).unwrap();
     let date = match args.is_empty() {
         true => Local::now().naive_local().date(),
-        false => match NaiveDate::parse_from_str(args.first().unwrap(), FORMAT) {
-            Ok(date) => date,
-            Err(e) => {
-                eprintln!("Error parsing date: {e}");
-                process::exit(1);
-            }
-        },
+        false => parse_date(args.first().unwrap().trim()),
     };
     println!("Current plan: {} (ID:{})", period.description, period.id);
     print_period_details(&period, &date);
