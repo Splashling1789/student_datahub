@@ -20,14 +20,15 @@ pub fn add_time(
     when: NaiveDate,
     amount_to_add: i32,
 ) {
-    let amount = subject.total_dedicated_time_day(when, conn) + amount_to_add;
+    let previous_amount = subject.total_dedicated_time_day(when, conn);
+    let amount = previous_amount + amount_to_add;
     // If there was no previous entries, it creates one.
-    if amount == amount_to_add {
+    if previous_amount == 0 && amount > 0 {
         match insert_into(entry)
             .values((
                 date.eq(when),
                 subject_id.eq(subject.id),
-                dedicated_time.eq(0),
+                dedicated_time.eq(amount),
             ))
             .execute(conn)
         {
@@ -38,19 +39,20 @@ pub fn add_time(
             }
         }
     }
-
-    match update(
-        entry
-            .filter(date.eq(when))
-            .filter(subject_id.eq(subject.id)),
-    )
-    .set(dedicated_time.eq(amount))
-    .execute(conn)
-    {
-        Ok(_) => {}
-        Err(e) => {
-            eprintln!("Failed to insert entry: {e}");
-            process::exit(1);
+    else if previous_amount > 0 && amount > previous_amount {
+        match update(
+            entry
+                .filter(date.eq(when))
+                .filter(subject_id.eq(subject.id)),
+        )
+            .set(dedicated_time.eq(amount))
+            .execute(conn)
+        {
+            Ok(_) => {}
+            Err(e) => {
+                eprintln!("Failed to insert entry: {e}");
+                process::exit(1);
+            }
         }
     }
 }

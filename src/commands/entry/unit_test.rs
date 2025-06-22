@@ -15,7 +15,7 @@ use crate::schema::subjects::{name, period_id, short_name};
 #[test]
 fn time_setters_test() {
     use assert_cmd::Command;
-    let (TEMPDIR, mut conn) = setup_test_environment!();
+    let (_TEMPDIR, mut conn) = setup_test_environment!();
     let date = Local::now().date_naive();
     insert_into(periods::dsl::periods)
         .values((periods::id.eq(1),
@@ -28,12 +28,22 @@ fn time_setters_test() {
                  period_id.eq(1),
                  short_name.eq("subj1"),
                  name.eq("Subject 1"))).execute(&mut conn).unwrap();
-
     let mut cmd = Command::cargo_bin("student_datahub").unwrap();
-    println!("{}", cmd.args(["add", "subj1", "0"]).assert().success().to_string());
-    debug_println!("{:?}", entry.filter(subject_id.eq(1))
+    cmd.args(["add", "subj1", "0"]);
+    assert!(
+        entry.filter(subject_id.eq(1))
             .load::<Entry>(&mut conn)
-            .unwrap());
+            .unwrap().is_empty()
+    );
+    cmd = Command::cargo_bin("student_datahub").unwrap();
+    cmd.args(["add", "subj1", "0"]);
+    assert!(
+        entry.filter(subject_id.eq(1))
+            .load::<Entry>(&mut conn)
+            .unwrap().is_empty()
+    );
+    cmd = Command::cargo_bin("student_datahub").unwrap();
+    cmd.args(["add", "subj1", "0"]);
     assert!(
         entry.filter(subject_id.eq(1))
             .load::<Entry>(&mut conn)
