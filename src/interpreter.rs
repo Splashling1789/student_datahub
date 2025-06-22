@@ -17,7 +17,7 @@ pub fn interpret(args: &mut Vec<String>) {
     match args.len() {
         0 => {
             usage::display_usage();
-            process::exit(0);
+            process::exit(1);
         }
         _ => {
             let option = args.first().unwrap().clone();
@@ -32,7 +32,10 @@ pub fn interpret(args: &mut Vec<String>) {
                 "substract" => entry::time_setter(&mut conn, args, EntryMode::Substract),
                 "set" => entry::time_setter(&mut conn, args, EntryMode::Set),
                 "export" => export::interpret(args, &mut conn),
-                _ => {}
+                _ => {
+                    usage::display_usage();
+                    process::exit(1);
+                }
             }
         }
     }
