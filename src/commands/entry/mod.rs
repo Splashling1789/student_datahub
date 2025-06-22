@@ -10,6 +10,7 @@ use crate::{format_hours_and_minutes, FORMAT};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::SqliteConnection;
 use std::process;
+use crate::interpreter::parse_date;
 
 mod add;
 mod set;
@@ -33,16 +34,7 @@ pub enum EntryMode {
 /// * `mode` - Entry altering mode.
 pub fn time_setter(conn: &mut SqliteConnection, args: &mut Vec<String>, mode: EntryMode) {
     let when: NaiveDate = match args.len() {
-        3 => match NaiveDate::parse_from_str(&args.first().unwrap().clone(), FORMAT) {
-            Ok(when) => {
-                args.remove(0);
-                when
-            }
-            Err(_) => {
-                eprintln!("Error parsing date. Remember using format {FORMAT}");
-                process::exit(1);
-            }
-        },
+        3 => parse_date(args.first().unwrap().clone().trim()),
         _ => Local::now().naive_local().date(),
     };
     if args.len() < 2 {
