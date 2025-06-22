@@ -40,7 +40,7 @@ fn get_header(subjects: &Vec<Subject>) -> Vec<String> {
 /// * `path` - File path.
 fn get_csv_writer(path: &PathBuf) -> Writer<File> {
     if !path.exists() {
-        match fs::create_dir_all(&path.parent().unwrap()) {
+        match fs::create_dir_all(path.parent().unwrap()) {
             Ok(_) => (),
             Err(e) => {
                 eprintln!("Failed to create directory when exporting: {e}");

@@ -34,7 +34,7 @@ pub fn list(conn: &mut SqliteConnection, plan_id: i32) {
         for s in subjects_from_plan {
             println!(
                 "{}, TDT: {}",
-                s.to_string(),
+                s,
                 format_hours_and_minutes(s.total_dedicated_time(conn))
             );
         }

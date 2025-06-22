@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use crate::models::{Entry, Subject};
 use crate::schema::entry::dsl::entry;
 use crate::schema::entry::{date, dedicated_time, subject_id};
@@ -9,20 +10,22 @@ use diesel::SqliteConnection;
 use diesel::{ExpressionMethods, RunQueryDsl};
 use std::process;
 
-impl Subject {
-    /// Gets a formatted string with relevant data of the subject.
-    pub fn to_string(&self) -> String {
+impl Display for Subject {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         if self.final_score.is_some() {
-            format!(
-                "{} ({}) [{}]",
-                self.name,
-                self.short_name,
-                self.final_score.unwrap()
-            )
-        } else {
-            format!("{} ({})", self.name, self.short_name)
+            write!(f, "{} ({}) [{}]",
+                   self.name,
+                   self.short_name,
+                   self.final_score.unwrap())
         }
+        else {
+            write!(f, "{} ({})", self.name, self.short_name)
+        }
+
     }
+}
+
+impl Subject {
     /// Gets the total dedicated time of the subject
     /// # Arguments
     /// * `conn` - Database connection

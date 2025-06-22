@@ -19,7 +19,7 @@ pub fn modify(
     for p in Period::fetch_all_plans(conn) {
         if p.id != plan_id && p.overlaps((new_start_date, new_end_date)) {
             eprintln!("The modified period cannot overlap another period.");
-            eprintln!("Overlapped period: {}", p.to_string());
+            eprintln!("Overlapped period: {}", p);
             process::exit(1);
         }
     }

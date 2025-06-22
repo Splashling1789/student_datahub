@@ -123,7 +123,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                 match get_subject(args.first().unwrap(), conn, Some(plan_id)) {
                     Some(subj) => {
                         if !args.contains(&"--confirm".to_string()) {
-                            println!("{}", subj.to_string());
+                            println!("{}", subj);
                             request_confirmation(
                                 "Are you sure you want to delete this subject? [y/n]",
                             );

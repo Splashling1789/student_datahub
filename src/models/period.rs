@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use crate::models::{Period, Subject};
 use crate::schema::entry::date;
 use crate::schema::entry::dsl::entry;
@@ -13,17 +14,17 @@ use diesel::QueryDsl;
 use diesel::{RunQueryDsl, SqliteConnection};
 use std::process;
 
-impl Period {
-    /// Gets a formatted string with relevant data of the period.
-    pub fn to_string(&self) -> String {
-        format!(
-            "{} - {}\t{} (ID:{})",
-            self.initial_date.format(FORMAT),
-            self.final_date.format(FORMAT),
-            self.description,
-            self.id
-        )
+impl Display for Period {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} - {}\t{} (ID:{})",
+               self.initial_date.format(FORMAT),
+               self.final_date.format(FORMAT),
+               self.description,
+               self.id)
     }
+}
+
+impl Period {
     /// It determines if the period is actual (It is ocurring now)
     pub fn is_actual(&self) -> bool {
         let now = Local::now().date_naive();

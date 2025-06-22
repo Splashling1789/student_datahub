@@ -26,7 +26,7 @@ pub fn list(conn: &mut SqliteConnection) {
         if i.is_actual() {
             println!("{}", i.to_string().green());
         } else {
-            println!("{}", i.to_string());
+            println!("{}", i);
         }
     }
 }

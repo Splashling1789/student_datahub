@@ -171,7 +171,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                     },
                 };
                 if !args.contains(&"--confirm".to_string()) {
-                    println!("{}", period.to_string());
+                    println!("{}", period);
                     request_confirmation("Are you sure you want to remove the study plan? [Y/N]");
                 }
                 remove::remove_plan(conn, period.id);
