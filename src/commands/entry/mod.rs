@@ -5,12 +5,12 @@ use crate::commands::entry::set::set_time;
 use crate::commands::entry::substract::subtract_time;
 use crate::commands::entry::usage::display_bad_usage;
 use crate::commands::subject::get_subject;
+use crate::format_hours_and_minutes;
+use crate::interpreter::parse_date;
 use crate::models::Period;
-use crate::{format_hours_and_minutes, FORMAT};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::SqliteConnection;
 use std::process;
-use crate::interpreter::parse_date;
 
 mod add;
 mod set;
@@ -32,7 +32,7 @@ pub enum EntryMode {
 /// * `conn` - Database connection
 /// * `args` - Remaining program arguments
 /// * `mode` - Entry altering mode.
-pub fn time_setter(conn: &mut SqliteConnection, args: &mut Vec<String>, mode: EntryMode) {
+pub fn time_setter(conn: &mut SqliteConnection, args: &mut [String], mode: EntryMode) {
     let when: NaiveDate = match args.len() {
         3 => parse_date(args.first().unwrap().clone().trim()),
         _ => Local::now().naive_local().date(),

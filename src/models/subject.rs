@@ -1,4 +1,3 @@
-use std::fmt::{Display, Formatter};
 use crate::models::{Entry, Subject};
 use crate::schema::entry::dsl::entry;
 use crate::schema::entry::{date, dedicated_time, subject_id};
@@ -8,20 +7,22 @@ use diesel::internal::derives::multiconnection::chrono::{NaiveDate, NaiveWeek};
 use diesel::QueryDsl;
 use diesel::SqliteConnection;
 use diesel::{ExpressionMethods, RunQueryDsl};
+use std::fmt::{Display, Formatter};
 use std::process;
 
 impl Display for Subject {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         if self.final_score.is_some() {
-            write!(f, "{} ({}) [{}]",
-                   self.name,
-                   self.short_name,
-                   self.final_score.unwrap())
-        }
-        else {
+            write!(
+                f,
+                "{} ({}) [{}]",
+                self.name,
+                self.short_name,
+                self.final_score.unwrap()
+            )
+        } else {
             write!(f, "{} ({})", self.name, self.short_name)
         }
-
     }
 }
 

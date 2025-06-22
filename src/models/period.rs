@@ -1,4 +1,3 @@
-use std::fmt::{Display, Formatter};
 use crate::models::{Period, Subject};
 use crate::schema::entry::date;
 use crate::schema::entry::dsl::entry;
@@ -12,15 +11,19 @@ use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::ExpressionMethods;
 use diesel::QueryDsl;
 use diesel::{RunQueryDsl, SqliteConnection};
+use std::fmt::{Display, Formatter};
 use std::process;
 
 impl Display for Period {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} - {}\t{} (ID:{})",
-               self.initial_date.format(FORMAT),
-               self.final_date.format(FORMAT),
-               self.description,
-               self.id)
+        write!(
+            f,
+            "{} - {}\t{} (ID:{})",
+            self.initial_date.format(FORMAT),
+            self.final_date.format(FORMAT),
+            self.description,
+            self.id
+        )
     }
 }
 

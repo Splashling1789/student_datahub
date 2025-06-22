@@ -10,11 +10,9 @@ use crate::commands::plan::usage::display_bad_usage;
 use crate::interpreter::{get_specific_arg, parse_date, request_confirmation};
 use crate::models::Period;
 use crate::{debug_println, FORMAT};
-use diesel::internal::derives::multiconnection::chrono::{Datelike, Local, NaiveDate};
+use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::SqliteConnection;
 use std::process;
-use diesel::internal::derives::multiconnection::chrono;
-use crate::commands::status::WEEKDAY_START;
 
 pub fn get_plan_arg(args: &mut Vec<String>, conn: &mut SqliteConnection) -> i32 {
     match get_specific_arg(args, "--plan") {

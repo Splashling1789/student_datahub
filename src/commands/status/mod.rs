@@ -8,17 +8,16 @@ mod daily_summary;
 mod period_details;
 mod weekly_summary;
 
-use crate::commands::plan::get_plan_arg;
 use crate::commands::status::daily_summary::daily_summary;
 use crate::commands::status::period_details::print_period_details;
 use crate::commands::status::weekly_summary::weekly_summary;
+use crate::debug_println;
+use crate::interpreter::parse_date;
 use crate::models::{Period, Subject};
-use crate::{debug_println, FORMAT};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate, TimeDelta, Weekday};
 use diesel::SqliteConnection;
 use std::process;
 use terminal_size::{terminal_size, Width};
-use crate::interpreter::parse_date;
 
 /// Day considered the first of the week.
 pub const WEEKDAY_START: Weekday = Weekday::Mon;
@@ -38,7 +37,7 @@ fn print_separator() {
 /// # Arguments:
 /// * `conn` - Database connection.
 /// * `args` - Program arguments.
-pub fn display_status(conn: &mut SqliteConnection, args: &mut Vec<String>) {
+pub fn display_status(conn: &mut SqliteConnection, args: &mut [String]) {
     let date = match args.is_empty() {
         true => Local::now().naive_local().date(),
         false => parse_date(args.first().unwrap().trim()),

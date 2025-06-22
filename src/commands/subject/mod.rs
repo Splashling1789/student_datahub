@@ -80,7 +80,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                     display_bad_usage();
                     process::exit(1);
                 }
-                let new_short_name =args.first().unwrap().clone();
+                let new_short_name = args.first().unwrap().clone();
                 let new_name = args.split_at(1).1.join(" ");
                 if new_short_name.parse::<i32>().is_ok() {
                     eprintln!("Short name can't be a number");
