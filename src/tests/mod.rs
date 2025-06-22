@@ -1,5 +1,4 @@
-use crate::debug_println;
-
+#[cfg(test)]
 #[macro_export]
 macro_rules! setup_test_environment {
     () => {{

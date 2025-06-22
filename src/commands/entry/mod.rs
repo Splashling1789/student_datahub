@@ -16,6 +16,7 @@ mod add;
 mod set;
 mod substract;
 mod usage;
+#[cfg(test)]
 mod unit_test;
 
 /// Mode of entry adding
