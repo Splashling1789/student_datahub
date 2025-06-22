@@ -26,7 +26,7 @@ pub(crate) fn weekly_summary(
             for i in times {
                 if i.1 != 0 {
                     println!(
-                        "\t * {} were dedicated on {}",
+                        "\t * {} were dedicated to {}",
                         format_hours_and_minutes(i.1),
                         i.0.name
                     );
