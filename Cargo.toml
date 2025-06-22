@@ -1,6 +1,6 @@
 [package]
 name = "student_datahub"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Javier Albero <splashling1789@gmail.com>"]
 description = "A command-line tool that lets you register your study time for later data-analysis"
