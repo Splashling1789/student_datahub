@@ -39,11 +39,16 @@ fn print_separator() {
 /// * `conn` - Database connection.
 /// * `args` - Program arguments.
 pub fn display_status(conn: &mut SqliteConnection, args: &mut Vec<String>) {
-    let plan_id = get_plan_arg(args, conn);
-    let period = Period::from_id(conn, plan_id).unwrap();
     let date = match args.is_empty() {
         true => Local::now().naive_local().date(),
         false => parse_date(args.first().unwrap().trim()),
+    };
+    let period = match Period::from_date(conn, &date) {
+        Some(p) => p,
+        None => {
+            println!("There is no plan for this date.");
+            process::exit(1);
+        }
     };
     println!("Current plan: {} (ID:{})", period.description, period.id);
     print_period_details(&period, &date);
