@@ -38,15 +38,14 @@ pub fn add_time(
                 process::exit(1);
             }
         }
-    }
-    else if previous_amount > 0 && amount > previous_amount {
+    } else if previous_amount > 0 && amount > previous_amount {
         match update(
             entry
                 .filter(date.eq(when))
                 .filter(subject_id.eq(subject.id)),
         )
-            .set(dedicated_time.eq(amount))
-            .execute(conn)
+        .set(dedicated_time.eq(amount))
+        .execute(conn)
         {
             Ok(_) => {}
             Err(e) => {

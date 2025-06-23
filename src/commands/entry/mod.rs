@@ -5,9 +5,9 @@ use crate::commands::entry::set::set_time;
 use crate::commands::entry::substract::subtract_time;
 use crate::commands::entry::usage::display_bad_usage;
 use crate::commands::subject::get_subject;
-use crate::{format_hours_and_minutes};
 use crate::interpreter::parse_date;
 use crate::models::Period;
+use crate::{debug_println, format_hours_and_minutes};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::SqliteConnection;
 use std::process;
@@ -15,9 +15,9 @@ use std::process;
 mod add;
 mod set;
 mod substract;
-mod usage;
 #[cfg(test)]
 mod unit_test;
+mod usage;
 
 /// Mode of entry adding
 /// * `ADD` - To add time.
@@ -34,9 +34,9 @@ pub enum EntryMode {
 /// * `conn` - Database connection
 /// * `args` - Remaining program arguments
 /// * `mode` - Entry altering mode.
-pub fn time_setter(conn: &mut SqliteConnection, args: &mut [String], mode: EntryMode) {
+pub fn time_setter(conn: &mut SqliteConnection, args: &mut Vec<String>, mode: EntryMode) {
     let when: NaiveDate = match args.len() {
-        3 => parse_date(args.first().unwrap().clone().trim()),
+        3 => parse_date(args.remove(0).trim()),
         _ => Local::now().naive_local().date(),
     };
     if args.len() < 2 {
@@ -47,6 +47,7 @@ pub fn time_setter(conn: &mut SqliteConnection, args: &mut [String], mode: Entry
         Some(plan) => plan.id,
         None => {
             eprintln!("There is no study plan ocurring on the current/specified date.");
+            debug_println!("{:?}", Period::fetch_all_plans(conn));
             process::exit(1);
         }
     };

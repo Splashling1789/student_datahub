@@ -7,8 +7,8 @@ mod db_connection_handler;
 mod interpreter;
 mod models;
 mod schema;
-mod usage;
 pub mod tests;
+mod usage;
 
 use std::path::Path;
 use std::{env, fs};
