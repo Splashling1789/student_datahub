@@ -93,6 +93,50 @@ fn add_commands(conn: &mut SqliteConnection) {
     }
 }
 
+fn substract_commands(conn : &mut SqliteConnection) {
+    let mut cmd = Command::cargo_bin("student_datahub").unwrap();
+    cmd.args(["substract", "subj1", "10"]).assert().success();
+    {
+        let results = entry.filter(subject_id.eq(1)).load::<Entry>(conn).unwrap();
+        assert_eq!(results.len(), 2);
+        let e = results.first().unwrap();
+        assert_eq!(e.dedicated_time, 20);
+        assert_eq!(e.date, Local::now().date_naive());
+    }
+    cmd = Command::cargo_bin("student_datahub").unwrap();
+    cmd.args(["substract", "subj1", "9999999"]).assert().failure();
+    cmd = Command::cargo_bin("student_datahub").unwrap();
+    cmd.args(["substract", "subj1", "20"]).assert().success();
+    {
+        let results = entry.filter(subject_id.eq(1)).load::<Entry>(conn).unwrap();
+        assert_eq!(results.len(), 1);
+        let e = results.first().unwrap();
+        assert_eq!(e.dedicated_time, 20);
+        assert_eq!(e.date, Local::now().date_naive().checked_add_days(Days::new(1)).unwrap());
+    }
+}
+
+fn set_commands(conn : &mut SqliteConnection) {
+    let mut cmd = Command::cargo_bin("student_datahub").unwrap();
+    let tomorrow = Local::now().date_naive().checked_add_days(Days::new(1)).unwrap().format(FORMAT).to_string();
+    cmd.args(["set", &tomorrow, "subj1", "0"]).assert().success();
+    {
+        let results = entry.filter(subject_id.eq(1)).load::<Entry>(conn).unwrap();
+        assert!(results.is_empty());
+    }
+    cmd = Command::cargo_bin("student_datahub").unwrap();
+    cmd.args(["set", "subj1", "-1"]).assert().failure();
+    cmd = Command::cargo_bin("student_datahub").unwrap();
+    cmd.args(["set", "subj1", "10"]).assert().success();
+    {
+        let results = entry.filter(subject_id.eq(1)).load::<Entry>(conn).unwrap();
+        assert_eq!(results.len(), 1);
+        let e = results.first().unwrap();
+        assert_eq!(e.dedicated_time, 10);
+        assert_eq!(e.date, Local::now().date_naive());
+    }
+}
+
 #[test]
 fn time_setters_test() {
     use assert_cmd::Command;
@@ -107,7 +151,6 @@ fn time_setters_test() {
         ))
         .execute(&mut conn)
         .unwrap();
-
     insert_into(subjects::dsl::subjects)
         .values((
             subjects::id.eq(1),
@@ -120,4 +163,6 @@ fn time_setters_test() {
 
     zero_commands(&mut conn);
     add_commands(&mut conn); // 30, 20
+    substract_commands(&mut conn); // 0, 20
+    set_commands(&mut conn);
 }
