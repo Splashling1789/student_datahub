@@ -5,7 +5,7 @@ use crate::schema::periods::dsl::periods;
 use crate::schema::periods::{final_date, initial_date};
 use crate::schema::subjects::dsl::subjects;
 use crate::schema::subjects::period_id;
-use crate::{debug_println, FORMAT};
+use crate::{debug_println, schema, FORMAT};
 use diesel::dsl::sql;
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use diesel::ExpressionMethods;
@@ -117,7 +117,7 @@ impl Period {
     /// #Arguments
     /// * `conn` - Database connection
     pub fn fetch_subjects(&self, conn: &mut SqliteConnection) -> Vec<Subject> {
-        match subjects.filter(period_id.eq(self.id)).load::<Subject>(conn) {
+        match subjects.filter(period_id.eq(self.id)).order_by(schema::subjects::id).load::<Subject>(conn) {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("Failed to fetch the subjects: {e}");

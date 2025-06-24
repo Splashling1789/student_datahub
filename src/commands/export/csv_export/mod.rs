@@ -5,6 +5,8 @@
 mod write_daily;
 mod write_monthly;
 mod write_weekly;
+#[cfg(test)]
+mod unit_test;
 
 use super::ExportMode;
 use crate::models::{Period, Subject};

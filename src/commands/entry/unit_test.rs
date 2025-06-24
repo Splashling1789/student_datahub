@@ -140,7 +140,7 @@ fn set_commands(conn : &mut SqliteConnection) {
 #[test]
 fn time_setters_test() {
     use assert_cmd::Command;
-    let (_tempdir, mut conn) = setup_test_environment!();
+    let (_tempdir, mut conn) = setup_test_environment!("student_datahub_time_setter_test");
     let date = Local::now().date_naive();
     insert_into(periods::dsl::periods)
         .values((
