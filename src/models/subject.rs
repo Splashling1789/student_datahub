@@ -2,7 +2,7 @@ use crate::models::{Entry, Subject};
 use crate::schema::entry::dsl::entry;
 use crate::schema::entry::{date, dedicated_time, subject_id};
 use crate::schema::subjects::dsl::subjects;
-use diesel::dsl::sum;
+use diesel::dsl;
 use diesel::internal::derives::multiconnection::chrono::{NaiveDate, NaiveWeek};
 use diesel::QueryDsl;
 use diesel::SqliteConnection;
@@ -12,13 +12,13 @@ use std::process;
 
 impl Display for Subject {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        if self.final_score.is_some() {
+        if let Some(final_score) = self.final_score {
             write!(
                 f,
                 "{} ({}) [{}]",
                 self.name,
                 self.short_name,
-                self.final_score.unwrap()
+                final_score
             )
         } else {
             write!(f, "{} ({})", self.name, self.short_name)
@@ -32,7 +32,7 @@ impl Subject {
     /// * `conn` - Database connection
     pub fn total_dedicated_time(&self, conn: &mut SqliteConnection) -> i32 {
         entry
-            .select(sum(dedicated_time))
+            .select(dsl::sum(dedicated_time))
             .filter(subject_id.eq(self.id))
             .first::<Option<i64>>(conn)
             .expect("Error loading entry")
@@ -48,7 +48,7 @@ impl Subject {
         interval: (NaiveDate, NaiveDate),
     ) -> i32 {
         entry
-            .select(sum(dedicated_time))
+            .select(dsl::sum(dedicated_time))
             .filter(subject_id.eq(self.id))
             .filter(date.ge(interval.0))
             .filter(date.le(interval.1))
