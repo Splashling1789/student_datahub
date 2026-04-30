@@ -1,10 +1,13 @@
 use std::fs;
+use std::fs::File;
 use std::ptr::read;
 use assert_cmd::assert::OutputAssertExt;
 use diesel::{Connection, ExpressionMethods, RunQueryDsl};
 use assert_cmd::cargo::CommandCargoExt;
+use csv::Reader;
 use diesel::dsl::insert_into;
 use diesel::internal::derives::multiconnection::chrono::{Days, Local, Months, NaiveDate, TimeDelta};
+use diesel::sql_types::Time;
 use rand::Rng;
 use crate::commands::export::SqliteConnection;
 use crate::commands::export::process::Command;
@@ -12,6 +15,8 @@ use crate::schema::*;
 use crate::schema::entry::{date, subject_id};
 use crate::schema::subjects::{name, period_id, short_name};
 use crate::{debug_println, setup_test_environment, FORMAT};
+use crate::commands::export::csv_export::{MONTHLY_FORMAT, WEEKLY_DELIMITER};
+use crate::commands::status::WEEKDAY_START;
 
 const NUM_SUBJECTS : i32 = 10;
 
@@ -52,8 +57,26 @@ fn export_test() {
         .filter(|file| file.path().is_dir())
         .map(|e| e.file_name().to_string_lossy().into_owned()).next().unwrap();
     let mut reader_daily = csv::Reader::from_path(_tempdir.path().join(".student_datahub").join(&folder).join("daily.csv")).unwrap();
-    i = initial.clone();
-    i_count = 0;
+    test_daily_record(initial, &mut table, &mut reader_daily);
+    {
+        let mut weekly_table = Vec::<Vec<i32>>::new();
+        let mut day = initial.clone();
+        i_count = 0;
+        while day < end {
+            let how_many_to_sum = (day.week(WEEKDAY_START).last_day().min(end) - day).num_days();
+            let
+            weekly_table.push()
+            
+        }
+    }
+    cmd = Command::cargo_bin("student_datahub").unwrap();
+    
+    
+}
+
+fn test_daily_record(initial: NaiveDate, table: &mut Vec<Vec<i32>>, reader_daily: &mut Reader<File>) {
+    let mut i = initial.clone();
+    let mut i_count = 0;
     for r in reader_daily.records() {
         let record = r.unwrap();
         debug_println!("{:?} ?= {:?}", record, table);
@@ -62,13 +85,58 @@ fn export_test() {
             if !read_date {
                 assert_eq!(NaiveDate::parse_from_str(s, FORMAT).unwrap(), i);
                 read_date = true;
-            }
-            else {
-                assert_eq!(table[i_count][s_count-1], s.parse::<i32>().unwrap());
+            } else {
+                assert_eq!(table[i_count][s_count - 1], s.parse::<i32>().unwrap());
             }
         }
         i += TimeDelta::days(1);
         i_count += 1;
     }
+}
 
+fn test_weekly_record(initial: NaiveDate, table : &mut Vec<Vec<i32>>, i: &mut NaiveDate, i_count: &mut usize, reader_weekly: &mut Reader<File>) {
+    let mut i = initial.clone().week(WEEKDAY_START);
+    let mut i_count = 0;
+    for r in reader_weekly.records() {
+        let record = r.unwrap();
+        debug_println!("{:?} ?= {:?}", record, table);
+        let mut read_date = false;
+        for (s_count, s) in record.iter().enumerate() {
+            if !read_date {
+                let (d1, d2) = {
+                        let collection : Vec<NaiveDate> = s.split(WEEKLY_DELIMITER).collect::<Vec<&str>>().iter().map(|d| NaiveDate::parse_from_str(d, FORMAT).unwrap()).collect();
+                        (collection[0], collection[1])
+                    };
+                assert_eq!(d1, i.first_day());
+                assert_eq!(d2, i.last_day());
+                read_date = true;
+            }
+            else {
+                assert_eq!(table[i_count][s_count - 1], s.parse::<i32>().unwrap());
+            }
+        }
+        i = (i.last_day() + TimeDelta::days(1)).week(WEEKDAY_START);
+        i_count += 1;
+    }
+}
+
+fn test_monthly_record(initial: NaiveDate, table : &mut Vec<Vec<i32>>, i: &mut NaiveDate, i_count: &mut usize, reader_weekly: &mut Reader<File>) {
+    let mut i = initial.clone().format(MONTHLY_FORMAT).to_string();
+    let mut i_count = 0;
+    for r in reader_weekly.records() {
+        let record = r.unwrap();
+        debug_println!("{:?} ?= {:?}", record, table);
+        let mut read_date = false;
+        for (s_count, s) in record.iter().enumerate() {
+            if !read_date {
+                assert_eq!(s, i);
+                read_date = true;
+            }
+            else {
+                assert_eq!(table[i_count][s_count - 1], s.parse::<i32>().unwrap());
+            }
+        }
+        i_count += 1;
+        i = (initial.checked_add_months(Months::new(i_count as u32)).unwrap()).format(FORMAT).to_string();
+    }
 }

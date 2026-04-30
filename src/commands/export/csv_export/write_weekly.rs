@@ -1,5 +1,5 @@
 //! Handles weekly csv export format
-use super::{get_csv_writer, get_header};
+use super::{get_csv_writer, get_header, WEEKLY_DELIMITER};
 use crate::commands::status::WEEKDAY_START;
 use crate::models::Period;
 use crate::FORMAT;
@@ -38,8 +38,9 @@ pub(crate) fn write_weekly(
         );
         let mut record: Vec<String> = Vec::new();
         record.push(format!(
-            "{}:{}",
+            "{}{}{}",
             interval_to_fetch.0.format(FORMAT),
+            WEEKLY_DELIMITER,
             interval_to_fetch.1.format(FORMAT)
         ));
         for j in &subjects {

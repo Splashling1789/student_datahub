@@ -24,6 +24,8 @@ use write_weekly::write_weekly;
 const DATETIME_FILENAME_EXPORT_FORMAT: &str = "%Y%m%d_%H%M%S";
 /// Date format when exporting monthly data.
 const MONTHLY_FORMAT: &str = "%m-%Y";
+/// Delimiter for first day and last day of a week.
+const WEEKLY_DELIMITER: &str = ":";
 
 /// Gets a csv header based on the short name of the provided list of subjects.
 /// # Arguments
