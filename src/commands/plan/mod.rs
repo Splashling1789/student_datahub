@@ -79,17 +79,7 @@ pub fn interpret(args: &mut Vec<String>, conn: &mut SqliteConnection) {
                         match args.len() {
                             2 => (
                                 Local::now().naive_local().date(),
-                                match NaiveDate::parse_from_str(&args[0], FORMAT) {
-                                    Ok(date) => date,
-                                    Err(e) => {
-                                        eprintln!(
-                                            "Could not parse date. Remember using format '{}'",
-                                            FORMAT
-                                        );
-                                        eprintln!("{e}");
-                                        process::exit(1);
-                                    }
-                                },
+                                parse_date(&args[0]),
                                 args[1].to_string(),
                             ),
 

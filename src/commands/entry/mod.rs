@@ -34,7 +34,11 @@ pub enum EntryMode {
 /// * `mode` - Entry altering mode.
 pub fn time_setter(conn: &mut SqliteConnection, args: &mut [String], mode: EntryMode) {
     let when: NaiveDate = match args.len() {
-        3 => parse_date(args.first().unwrap().clone().trim()),
+        3 => {
+            let _date_str = args.first().unwrap();
+            parse_date(args.first().unwrap().clone().trim())
+
+        },
         _ => Local::now().naive_local().date(),
     };
     if args.len() < 2 {

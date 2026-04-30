@@ -6,9 +6,14 @@
 use crate::commands::entry::EntryMode;
 use crate::commands::{entry, export, plan, status, subject};
 use crate::db_connection_handler::stablish_and_run_migrations;
-use crate::{debug_println, usage, FORMAT};
+use crate::{debug_println, usage};
 use diesel::internal::derives::multiconnection::chrono::{Local, NaiveDate};
 use std::process;
+use diesel::internal::derives::multiconnection::chrono;
+use regex::Regex;
+
+const RE_ABSOLUTE_DATE: &str = r"(\d{1,2})(?:-|/)(\d{1,2})(?:-|/)(\d{4})";
+const RE_RELATIVE_DATE: &str = r"@(-?\d+)";
 
 /// Interprets the first command of the arguments provided and delegates the work to submodule commands
 /// # Arguments
@@ -92,20 +97,45 @@ pub fn detect_unknown_arg(args: &Vec<String>, options: &Vec<&str>, prefix: &str)
     None
 }
 
+/// Parses a date string. It can be either in the format specified in regex `RE_ABSOLUTE_DATE` or 'RE_RELATIVE_DATE'.
+/// # Arguments
+/// * `date` - Date string to parse.
+///
+/// # Returns
+/// The given date if it matches with `RE_ABSOLUTE_DATE` or the current date +/- the given number of days if it matches with `RE_RELATIVE_DATE`
 pub fn parse_date(date: &str) -> NaiveDate {
-    match NaiveDate::parse_from_str(date, FORMAT) {
-        Ok(d) => d,
-        Err(e) => match date.to_lowercase().trim() {
-            "@yest" | "@yesterday" => Local::now()
-                .naive_local()
-                .date()
-                .pred_opt()
-                .expect("Unexpected date provided"),
-            _ => {
-                eprintln!("Failed to parse date. Remember using format '{}'", FORMAT);
-                debug_println!("{e}");
-                process::exit(1);
+    let abs_re = Regex::new(RE_ABSOLUTE_DATE).expect("Error in the date regular expression");
+    match abs_re.captures(date) {
+        Some(caps) => {
+            let day = caps.get(1).unwrap().as_str().parse::<u32>().unwrap();
+            let month = caps.get(2).unwrap().as_str().parse::<u32>().unwrap();
+            let year = caps.get(3).unwrap().as_str().parse::<i32>().unwrap();
+            match NaiveDate::from_ymd_opt(year, month, day) {
+                Some(d) => d,
+                None => {
+                    eprintln!("Invalid date!");
+                    process::exit(1);
+                }
             }
-        },
+        }
+        None => {
+            let rel_re = Regex::new(RE_RELATIVE_DATE).expect("Error in the date regular expression");
+            match rel_re.captures(date) {
+                Some(caps) => {
+                    let relative = caps.get(1).unwrap().as_str().parse::<i64>().unwrap();
+                    if relative < 0 {
+                        Local::now().date_naive() - chrono::Duration::days(-relative)
+                    }
+                    else {
+                        Local::now().date_naive() + chrono::Duration::days(relative)
+                    }
+                }
+                None => {
+                    eprintln!("Invalid date!");
+                    process::exit(1);
+                }
+            }
+        }
+
     }
 }
